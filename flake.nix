@@ -3,8 +3,14 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    opencode.url = "github:anomalyco/opencode/dev";
-    bun2nix.url = "github:nix-community/bun2nix";
+    opencode = {
+      url = "github:anomalyco/opencode/dev";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    bun2nix = {
+      url = "github:nix-community/bun2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     oh-my-opencode = {
       url = "github:code-yeongyu/oh-my-opencode/dev";
       flake = false;
