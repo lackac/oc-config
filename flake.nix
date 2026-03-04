@@ -26,7 +26,14 @@
         system:
         let
           pkgs = import nixpkgs { inherit system; };
-          upstreamOpencode = opencode.packages.${system}.opencode;
+          opencodePr15089Patch = pkgs.fetchpatch {
+            url = "https://github.com/kavhnr/opencode/commit/ef1bf8f9088291ef655f7198235ec917cc522b82.patch";
+            hash = "sha256-ufNA+14Al/MqNiDNHkeW7esYkEqSzrnmNTfPJZfZO20=";
+          };
+
+          patchedOpencode = opencode.packages.${system}.opencode.overrideAttrs (old: {
+            patches = (old.patches or [ ]) ++ [ opencodePr15089Patch ];
+          });
 
           configDir = pkgs.runCommand "opencode-config-core" { } ''
             mkdir -p "$out"
@@ -42,10 +49,10 @@
             installPhase = ''
               mkdir -p "$out/bin"
 
-              makeWrapper ${upstreamOpencode}/bin/opencode "$out/bin/opencode" \
+              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/opencode" \
                 --set OPENCODE_CONFIG_DIR ${configDir}
 
-              makeWrapper ${upstreamOpencode}/bin/opencode "$out/bin/oc" \
+              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/oc" \
                 --set OPENCODE_CONFIG_DIR ${configDir}
             '';
 
