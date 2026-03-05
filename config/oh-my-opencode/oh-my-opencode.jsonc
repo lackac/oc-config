@@ -211,6 +211,11 @@
     }
   },
 
+  "git_master": {
+    "include_co_authored_by": false,
+    "commit_footer": false
+  },
+
   "experimental": { "aggressive_truncation": true, "task_system": true },
   "tmux": { "enabled": false }
 }
