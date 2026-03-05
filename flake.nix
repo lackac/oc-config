@@ -2,7 +2,7 @@
   description = "Opinionated OpenCode wrappers and profiles";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     opencode = {
       url = "github:anomalyco/opencode/dev";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -15,14 +15,20 @@
       url = "github:code-yeongyu/oh-my-opencode/dev";
       flake = false;
     };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     {
+      self,
       nixpkgs,
       opencode,
       bun2nix,
       oh-my-opencode,
+      treefmt-nix,
       ...
     }:
     let
@@ -32,13 +38,15 @@
         "aarch64-linux"
         "x86_64-linux"
       ];
+      pkgsFor = system: import nixpkgs { inherit system; };
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
+      treefmtEval = forAllSystems (system: treefmt-nix.lib.evalModule (pkgsFor system) ./treefmt.nix);
     in
     {
       packages = forAllSystems (
         system:
         let
-          pkgs = import nixpkgs { inherit system; };
+          pkgs = pkgsFor system;
           bun2nixPkg = bun2nix.packages.${system}.default;
           opencodePr15089Patch = pkgs.fetchpatch {
             url = "https://github.com/kavhnr/opencode/commit/ef1bf8f9088291ef655f7198235ec917cc522b82.patch";
@@ -88,22 +96,25 @@
             cp -R ${./config/core}/. "$out/"
           '';
 
-          ohMyOpencodeConfigDir = pkgs.runCommand "opencode-config-oh-my-opencode" {
-            nativeBuildInputs = [ pkgs.jq ];
-          } ''
-            mkdir -p "$out"
-            cp -R ${./config/core}/. "$out/"
-            jq '.default_agent = "sisyphus"' "$out/opencode.jsonc" > "$out/opencode.jsonc.tmp"
-            mv "$out/opencode.jsonc.tmp" "$out/opencode.jsonc"
-            cp ${./config/oh-my-opencode/oh-my-opencode.jsonc} "$out/oh-my-opencode.jsonc"
-            mkdir -p "$out/plugins"
+          ohMyOpencodeConfigDir =
+            pkgs.runCommand "opencode-config-oh-my-opencode"
+              {
+                nativeBuildInputs = [ pkgs.jq ];
+              }
+              ''
+                            mkdir -p "$out"
+                            cp -R ${./config/core}/. "$out/"
+                            jq '.default_agent = "sisyphus"' "$out/opencode.jsonc" > "$out/opencode.jsonc.tmp"
+                            mv "$out/opencode.jsonc.tmp" "$out/opencode.jsonc"
+                            cp ${./config/oh-my-opencode/oh-my-opencode.jsonc} "$out/oh-my-opencode.jsonc"
+                            mkdir -p "$out/plugins"
 
-            cat > "$out/plugins/oh-my-opencode.js" <<'EOF'
-import plugin from "${ohMyOpencodePlugin}/lib/oh-my-opencode/dist/index.js"
+                            cat > "$out/plugins/oh-my-opencode.js" <<'EOF'
+                import plugin from "${ohMyOpencodePlugin}/lib/oh-my-opencode/dist/index.js"
 
-export default plugin
-EOF
-          '';
+                export default plugin
+                EOF
+              '';
 
           wrappedOpencode = pkgs.stdenvNoCC.mkDerivation {
             pname = "opencode-profile-custom";
@@ -157,5 +168,26 @@ EOF
           "oh-my-opencode" = wrappedOhMyOpencode;
         }
       );
+
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = pkgsFor system;
+        in
+        {
+          default = pkgs.mkShell {
+            packages = [
+              self.packages.${system}.opencode
+              self.packages.${system}."oh-my-opencode"
+            ];
+          };
+        }
+      );
+
+      formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
+
+      checks = forAllSystems (system: {
+        formatting = treefmtEval.${system}.config.build.check self;
+      });
     };
 }
