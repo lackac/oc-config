@@ -55,6 +55,9 @@
 
           patchedOpencode = opencode.packages.${system}.opencode.overrideAttrs (old: {
             patches = (old.patches or [ ]) ++ [ opencodePr15089Patch ];
+            env = (old.env or { }) // {
+              OPENCODE_CHANNEL = "stable";
+            };
           });
 
           ohMyOpencodeDeps = bun2nixPkg.fetchBunDeps {
