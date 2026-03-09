@@ -88,20 +88,20 @@
         "type": "github"
       }
     },
-    "oh-my-opencode": {
+    "oh-my-openagent": {
       "flake": false,
       "locked": {
-        "lastModified": 1772661230,
-        "narHash": "sha256-BRy2Gu9WN7YK0DdWp8Wetaz9GMN0G5t3SDUfDv4uYqM=",
+        "lastModified": 1773067036,
+        "narHash": "sha256-WPGxEeJBG7QIyFCmPd9BTZAQsfzxoDhEjy/zKyPQQdY=",
         "owner": "code-yeongyu",
-        "repo": "oh-my-opencode",
-        "rev": "f8d2bd55b94be816e4a7e4d8fe00a70edb912c4c",
+        "repo": "oh-my-openagent",
+        "rev": "61867b31e5f50dd77b900f5196f595ef8e56df8b",
         "type": "github"
       },
       "original": {
         "owner": "code-yeongyu",
         "ref": "dev",
-        "repo": "oh-my-opencode",
+        "repo": "oh-my-openagent",
         "type": "github"
       }
     },
@@ -130,7 +130,7 @@
       "inputs": {
         "bun2nix": "bun2nix",
         "nixpkgs": "nixpkgs",
-        "oh-my-opencode": "oh-my-opencode",
+        "oh-my-openagent": "oh-my-openagent",
         "opencode": "opencode",
         "treefmt-nix": "treefmt-nix_2"
       }

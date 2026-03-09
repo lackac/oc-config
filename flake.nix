@@ -11,8 +11,8 @@
       url = "github:nix-community/bun2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    oh-my-opencode = {
-      url = "github:code-yeongyu/oh-my-opencode/dev";
+    oh-my-openagent = {
+      url = "github:code-yeongyu/oh-my-openagent/dev";
       flake = false;
     };
     treefmt-nix = {
@@ -27,7 +27,7 @@
       nixpkgs,
       opencode,
       bun2nix,
-      oh-my-opencode,
+      oh-my-openagent,
       treefmt-nix,
       ...
     }:
@@ -39,7 +39,7 @@
         "x86_64-linux"
       ];
       pkgsFor = system: import nixpkgs { inherit system; };
-      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
+      forAllSystems = nixpkgs.lib.genAttrs systems;
       treefmtEval = forAllSystems (system: treefmt-nix.lib.evalModule (pkgsFor system) ./treefmt.nix);
     in
     {
@@ -60,21 +60,21 @@
             };
           });
 
-          ohMyOpencodeDeps = bun2nixPkg.fetchBunDeps {
-            bunNix = ./nix/oh-my-opencode/bun.nix;
+          ohMyOpenagentDeps = bun2nixPkg.fetchBunDeps {
+            bunNix = ./nix/oh-my-openagent/bun.nix;
           };
 
-          ohMyOpencodePlugin = pkgs.stdenvNoCC.mkDerivation {
-            pname = "oh-my-opencode-plugin";
+          ohMyOpenagentPlugin = pkgs.stdenvNoCC.mkDerivation {
+            pname = "oh-my-openagent-plugin";
             version = "unstable";
-            src = oh-my-opencode;
+            src = oh-my-openagent;
 
             nativeBuildInputs = [
               bun2nixPkg.hook
               pkgs.bun
             ];
 
-            bunDeps = ohMyOpencodeDeps;
+            bunDeps = ohMyOpenagentDeps;
             dontRunLifecycleScripts = true;
             dontUseBunBuild = true;
             dontUseBunInstall = true;
@@ -87,9 +87,9 @@
 
             installPhase = ''
               runHook preInstall
-              mkdir -p "$out/lib/oh-my-opencode"
-              cp -R dist "$out/lib/oh-my-opencode/"
-              cp -R node_modules "$out/lib/oh-my-opencode/"
+              mkdir -p "$out/lib/oh-my-openagent"
+              cp -R dist "$out/lib/oh-my-openagent/"
+              cp -R node_modules "$out/lib/oh-my-openagent/"
               runHook postInstall
             '';
           };
@@ -99,21 +99,21 @@
             cp -R ${./config/core}/. "$out/"
           '';
 
-          ohMyOpencodeConfigDir =
-            pkgs.runCommand "opencode-config-oh-my-opencode"
+          ohMyOpenagentConfigDir =
+            pkgs.runCommand "opencode-config-omo"
               {
                 nativeBuildInputs = [ pkgs.jq ];
               }
               ''
-                            mkdir -p "$out"
-                            cp -R ${./config/core}/. "$out/"
-                            jq '.default_agent = "sisyphus"' "$out/opencode.jsonc" > "$out/opencode.jsonc.tmp"
-                            mv "$out/opencode.jsonc.tmp" "$out/opencode.jsonc"
-                            cp ${./config/oh-my-opencode/oh-my-opencode.jsonc} "$out/oh-my-opencode.jsonc"
-                            mkdir -p "$out/plugins"
+                mkdir -p "$out"
+                cp -R ${./config/core}/. "$out/"
+                jq '.default_agent = "sisyphus"' "$out/opencode.jsonc" > "$out/opencode.jsonc.tmp"
+                mv "$out/opencode.jsonc.tmp" "$out/opencode.jsonc"
+                cp ${./config/oh-my-openagent/oh-my-openagent.jsonc} "$out/oh-my-opencode.jsonc"
+                mkdir -p "$out/plugins"
 
-                            cat > "$out/plugins/oh-my-opencode.js" <<'EOF'
-                import plugin from "${ohMyOpencodePlugin}/lib/oh-my-opencode/dist/index.js"
+                cat > "$out/plugins/oh-my-openagent.js" <<'EOF'
+                import plugin from "${ohMyOpenagentPlugin}/lib/oh-my-openagent/dist/index.js"
 
                 export default plugin
                 EOF
@@ -142,8 +142,8 @@
             };
           };
 
-          wrappedOhMyOpencode = pkgs.stdenvNoCC.mkDerivation {
-            pname = "opencode-profile-oh-my-opencode";
+          wrappedOhMyOpenagent = pkgs.stdenvNoCC.mkDerivation {
+            pname = "opencode-profile-omo";
             version = "unstable";
             dontUnpack = true;
             nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
@@ -151,24 +151,25 @@
             installPhase = ''
               mkdir -p "$out/bin"
 
-              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/oh-my-opencode" \
-                --set OPENCODE_CONFIG_DIR ${ohMyOpencodeConfigDir}
+              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/oh-my-openagent" \
+                --set OPENCODE_CONFIG_DIR ${ohMyOpenagentConfigDir}
 
               makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/omo" \
-                --set OPENCODE_CONFIG_DIR ${ohMyOpencodeConfigDir}
+                --set OPENCODE_CONFIG_DIR ${ohMyOpenagentConfigDir}
             '';
 
             meta = {
-              description = "OpenCode wrapper with oh-my-opencode profile";
-              mainProgram = "oh-my-opencode";
+              description = "OpenCode wrapper with oh-my-openagent profile";
+              mainProgram = "oh-my-openagent";
               platforms = nixpkgs.lib.platforms.all;
             };
           };
+
         in
         {
           default = wrappedOpencode;
           opencode = wrappedOpencode;
-          "oh-my-opencode" = wrappedOhMyOpencode;
+          "oh-my-openagent" = wrappedOhMyOpenagent;
         }
       );
 
@@ -176,12 +177,32 @@
         system:
         let
           pkgs = pkgsFor system;
+          bun2nixPkg = bun2nix.packages.${system}.default;
+          refreshOpenagentBun = pkgs.writeShellApplication {
+            name = "refresh-openagent-bun";
+            runtimeInputs = [
+              pkgs.coreutils
+              pkgs.gawk
+              bun2nixPkg
+            ];
+            text = ''
+              repo_root="''${1:-$PWD}"
+              cd "$repo_root"
+
+              mkdir -p nix/oh-my-openagent
+              cp ${oh-my-openagent}/bun.lock nix/oh-my-openagent/bun.lock
+              bun2nix -l nix/oh-my-openagent/bun.lock -o nix/oh-my-openagent/bun.nix
+              awk 1 nix/oh-my-openagent/bun.nix > nix/oh-my-openagent/bun.nix.tmp
+              mv nix/oh-my-openagent/bun.nix.tmp nix/oh-my-openagent/bun.nix
+            '';
+          };
         in
         {
           default = pkgs.mkShell {
             packages = [
+              refreshOpenagentBun
               self.packages.${system}.opencode
-              self.packages.${system}."oh-my-opencode"
+              self.packages.${system}."oh-my-openagent"
             ];
           };
         }
@@ -189,8 +210,25 @@
 
       formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
 
-      checks = forAllSystems (system: {
-        formatting = treefmtEval.${system}.config.build.check self;
-      });
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = pkgsFor system;
+        in
+        {
+          formatting = treefmtEval.${system}.config.build.check self;
+
+          oh-my-openagent-lockfile =
+            pkgs.runCommand "oh-my-openagent-lockfile-check"
+              {
+                nativeBuildInputs = [ pkgs.diffutils ];
+              }
+              ''
+                diff -u ${oh-my-openagent}/bun.lock ${./nix/oh-my-openagent/bun.lock}
+                mkdir -p "$out"
+              '';
+
+        }
+      );
     };
 }

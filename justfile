@@ -9,6 +9,9 @@ fmt:
 check:
   nix flake check
 
+refresh-openagent-bun:
+  nix develop -c refresh-openagent-bun .
+
 up:
   nix flake update
 
