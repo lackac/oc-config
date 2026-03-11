@@ -60,6 +60,16 @@
             };
           });
 
+          baselineLsps = [
+            pkgs.nixd
+            pkgs.marksman
+            pkgs.vscode-langservers-extracted
+            pkgs.nodePackages.bash-language-server
+            pkgs.nodePackages.yaml-language-server
+          ];
+
+          baselineLspPath = pkgs.lib.makeBinPath baselineLsps;
+
           ohMyOpenagentDeps = bun2nixPkg.fetchBunDeps {
             bunNix = ./nix/oh-my-openagent/bun.nix;
           };
@@ -129,10 +139,14 @@
               mkdir -p "$out/bin"
 
               makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/opencode" \
-                --set OPENCODE_CONFIG_DIR ${coreConfigDir}
+                --set OPENCODE_CONFIG_DIR ${coreConfigDir} \
+                --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
+                --suffix PATH : ${baselineLspPath}
 
               makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/oc" \
-                --set OPENCODE_CONFIG_DIR ${coreConfigDir}
+                --set OPENCODE_CONFIG_DIR ${coreConfigDir} \
+                --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
+                --suffix PATH : ${baselineLspPath}
             '';
 
             meta = {
@@ -152,10 +166,14 @@
               mkdir -p "$out/bin"
 
               makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/oh-my-openagent" \
-                --set OPENCODE_CONFIG_DIR ${ohMyOpenagentConfigDir}
+                --set OPENCODE_CONFIG_DIR ${ohMyOpenagentConfigDir} \
+                --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
+                --suffix PATH : ${baselineLspPath}
 
               makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/omo" \
-                --set OPENCODE_CONFIG_DIR ${ohMyOpenagentConfigDir}
+                --set OPENCODE_CONFIG_DIR ${ohMyOpenagentConfigDir} \
+                --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
+                --suffix PATH : ${baselineLspPath}
             '';
 
             meta = {

@@ -4,6 +4,16 @@
   "small_model": "opencode/claude-haiku-4-5",
   "model": "openai/gpt-5.4",
   "default_agent": "plan",
+  "lsp": {
+    "json-ls": {
+      "command": ["vscode-json-language-server", "--stdio"],
+      "extensions": [".json", ".jsonc"]
+    },
+    "marksman": {
+      "command": ["marksman", "server"],
+      "extensions": [".md", ".markdown"]
+    }
+  },
   "experimental": {
     "disable_paste_summary": true
   }
