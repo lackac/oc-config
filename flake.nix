@@ -61,6 +61,7 @@
           });
 
           baselineLsps = [
+            pkgs.ast-grep
             pkgs.nixd
             pkgs.marksman
             pkgs.vscode-langservers-extracted
