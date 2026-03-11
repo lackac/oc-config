@@ -229,6 +229,6 @@
     "commit_footer": false
   },
 
-  "experimental": { "aggressive_truncation": true, "task_system": true },
+  "experimental": { "aggressive_truncation": true, "task_system": false },
   "tmux": { "enabled": false }
 }
