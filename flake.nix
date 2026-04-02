@@ -48,13 +48,7 @@
         let
           pkgs = pkgsFor system;
           bun2nixPkg = bun2nix.packages.${system}.default;
-          opencodePr15089Patch = pkgs.fetchpatch {
-            url = "https://github.com/kavhnr/opencode/commit/ef1bf8f9088291ef655f7198235ec917cc522b82.patch";
-            hash = "sha256-ufNA+14Al/MqNiDNHkeW7esYkEqSzrnmNTfPJZfZO20=";
-          };
-
           patchedOpencode = opencode.packages.${system}.opencode.overrideAttrs (old: {
-            patches = (old.patches or [ ]) ++ [ opencodePr15089Patch ];
             env = (old.env or { }) // {
               OPENCODE_CHANNEL = "stable";
             };
@@ -196,30 +190,10 @@
         system:
         let
           pkgs = pkgsFor system;
-          bun2nixPkg = bun2nix.packages.${system}.default;
-          refreshOpenagentBun = pkgs.writeShellApplication {
-            name = "refresh-openagent-bun";
-            runtimeInputs = [
-              pkgs.coreutils
-              pkgs.gawk
-              bun2nixPkg
-            ];
-            text = ''
-              repo_root="''${1:-$PWD}"
-              cd "$repo_root"
-
-              mkdir -p nix/oh-my-openagent
-              cp ${oh-my-openagent}/bun.lock nix/oh-my-openagent/bun.lock
-              bun2nix -l nix/oh-my-openagent/bun.lock -o nix/oh-my-openagent/bun.nix
-              awk 1 nix/oh-my-openagent/bun.nix > nix/oh-my-openagent/bun.nix.tmp
-              mv nix/oh-my-openagent/bun.nix.tmp nix/oh-my-openagent/bun.nix
-            '';
-          };
         in
         {
           default = pkgs.mkShell {
             packages = [
-              refreshOpenagentBun
               self.packages.${system}.opencode
               self.packages.${system}."oh-my-openagent"
             ];
