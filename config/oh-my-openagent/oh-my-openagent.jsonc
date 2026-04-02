@@ -16,24 +16,22 @@
       "model": "openai/gpt-5.4",
       "reasoningEffort": "medium",
       "fallback_models": [
-        "anthropic/claude-opus-4-6",
         "github-copilot/claude-opus-4.6",
-        "anthropic/claude-sonnet-4-6",
+        "openai/gpt-5.3-codex",
         "github-copilot/claude-sonnet-4.6",
         "opencode/claude-sonnet-4-6",
         "github-copilot/claude-haiku-4.5"
       ],
-      "ultrawork": { "model": "anthropic/claude-opus-4-6", "variant": "max" }
+      "ultrawork": { "variant": "xhigh" }
     },
     // Strategic planner for interview-style planning and high-level architecture shaping.
     "prometheus": {
       "model": "openai/gpt-5.4",
       "reasoningEffort": "high",
       "fallback_models": [
-        "anthropic/claude-opus-4-6",
         "github-copilot/claude-opus-4.6",
         "openai/gpt-5.3-codex",
-        "anthropic/claude-sonnet-4-6"
+        "github-copilot/claude-sonnet-4.6"
       ]
     },
     // Plan gap analyzer for finding missing steps and weak assumptions before execution.
@@ -41,19 +39,17 @@
       "model": "openai/gpt-5.4",
       "reasoningEffort": "high",
       "fallback_models": [
-        "anthropic/claude-opus-4-6",
         "github-copilot/claude-opus-4.6",
         "openai/gpt-5.3-codex",
-        "anthropic/claude-sonnet-4-6"
+        "github-copilot/claude-sonnet-4.6"
       ]
     },
     // Todo orchestrator for sequencing task items and driving execution across steps.
     "atlas": {
-      "model": "anthropic/claude-sonnet-4-6",
+      "model": "openai/gpt-5.4",
       "fallback_models": [
-        "openai/gpt-5.4",
-        "openai/gpt-5.3-codex",
         "github-copilot/claude-sonnet-4.6",
+        "openai/gpt-5.3-codex",
         "opencode/claude-sonnet-4-6",
         "github-copilot/claude-haiku-4.5"
       ]
@@ -64,9 +60,9 @@
       "model": "openai/gpt-5.3-codex",
       "reasoningEffort": "high",
       "fallback_models": [
-        "openai/gpt-5.4",
         "github-copilot/gpt-5.3-codex",
-        "anthropic/claude-sonnet-4-6"
+        "openai/gpt-5.4",
+        "github-copilot/claude-sonnet-4.6"
       ]
     },
     // Read-only architecture consultant for high-stakes design and debugging judgment.
@@ -77,7 +73,7 @@
         "github-copilot/gpt-5.2",
         "github-copilot/gpt-5.3-codex",
         "openai/gpt-5.3-codex",
-        "anthropic/claude-sonnet-4-6"
+        "github-copilot/claude-sonnet-4.6"
       ]
     },
     // Ruthless reviewer for plan review, QA thinking, and critical verification passes.
@@ -87,7 +83,7 @@
       "fallback_models": [
         "github-copilot/gpt-5.3-codex",
         "openai/gpt-5.3-codex",
-        "anthropic/claude-sonnet-4-6"
+        "github-copilot/claude-sonnet-4.6"
       ]
     },
 
@@ -103,11 +99,12 @@
     },
     // Docs and external code search agent for pulling references from outside the repo.
     "librarian": {
-      "model": "anthropic/claude-sonnet-4-6",
+      "model": "openai/gpt-5.4",
       "fallback_models": [
         "github-copilot/gemini-3-flash-preview",
         "openai/gpt-5.1-codex-mini",
         "github-copilot/gpt-5-mini",
+        "opencode/claude-sonnet-4-6",
         "opencode/gpt-5-nano"
       ]
     },
@@ -148,48 +145,48 @@
       "reasoningEffort": "high",
       "fallback_models": [
         "openai/gpt-5.3-codex",
-        "anthropic/claude-sonnet-4-6"
+        "github-copilot/claude-sonnet-4.6"
       ]
     },
     "deep": {
       "model": "openai/gpt-5.3-codex",
       "reasoningEffort": "medium",
       "fallback_models": [
-        "openai/gpt-5.4",
         "github-copilot/gpt-5.3-codex",
-        "anthropic/claude-sonnet-4-6"
+        "openai/gpt-5.4",
+        "github-copilot/claude-sonnet-4.6"
       ]
     },
     "ultrabrain": {
       "model": "openai/gpt-5.3-codex",
       "reasoningEffort": "xhigh",
       "fallback_models": [
-        "openai/gpt-5.4",
         "github-copilot/gpt-5.3-codex",
-        "anthropic/claude-opus-4-6"
+        "openai/gpt-5.4",
+        "github-copilot/claude-opus-4.6"
       ]
     },
     "writing": {
       "model": "openai/gpt-5.4",
       "fallback_models": [
-        "anthropic/claude-sonnet-4-6",
-        "github-copilot/gpt-5.2"
+        "github-copilot/gpt-5.2",
+        "github-copilot/claude-sonnet-4.6"
       ]
     },
     "visual-engineering": {
       "model": "github-copilot/gemini-3.1-pro-preview",
       "fallback_models": [
+        "openai/gpt-5.4",
         "github-copilot/gemini-3-pro-preview",
-        "github-copilot/gemini-3-flash-preview",
-        "openai/gpt-5.4"
+        "github-copilot/gemini-3-flash-preview"
       ]
     },
     "artistry": {
       "model": "github-copilot/gemini-3-pro-preview",
       "fallback_models": [
+        "openai/gpt-5.2",
         "github-copilot/gemini-3-flash-preview",
-        "anthropic/claude-sonnet-4-6",
-        "openai/gpt-5.2"
+        "github-copilot/claude-sonnet-4.6"
       ]
     },
 
@@ -207,14 +204,11 @@
 
   "background_task": {
     "providerConcurrency": {
-      "anthropic": 1,
       "openai": 5,
       "github-copilot": 4,
       "opencode": 2
     },
     "modelConcurrency": {
-      "anthropic/claude-opus-4-6": 1,
-      "anthropic/claude-sonnet-4-6": 2,
       "openai/gpt-5.4": 3,
       "openai/gpt-5.3-codex": 4,
       "openai/gpt-5.1-codex-mini": 8,
