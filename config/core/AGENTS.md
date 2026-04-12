@@ -40,6 +40,12 @@ git commit -m "chore: bump dependencies"
 git commit -m "test: cover all edge cases of throttling functionality"
 ```
 
+- Prefer subject lines that state the intent or effect of the change, not just the file operation.
+- Avoid defaulting to generic verbs such as “add,” “remove,” or “update” when a more precise summary would better explain the change.
+- Choose wording that captures why the change matters or what behavior or structure changed.
+- Keep the line concise, specific, and natural to read aloud.
+- Avoid formulaic phrasing and repeated verb patterns across commits.
+
 ## Timestamp convention
 
 - For generated filenames and in-file metadata timestamps, use `YYYY-MM-DD-HHmmss`.
