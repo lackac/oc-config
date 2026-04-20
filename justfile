@@ -19,13 +19,19 @@ refresh-openagent-bun:
 up:
   nix flake update
 
-upp input:
-  nix flake update {{input}}
+upp-opencode-tag tag:
+  nix flake lock . --override-input opencode github:anomalyco/opencode/{{tag}}
+
+upp-oh-my-openagent-tag tag:
+  nix flake lock . --override-input oh-my-openagent github:code-yeongyu/oh-my-openagent/{{tag}}
+
+upp input tag='':
+  if [ -n "{{tag}}" ]; then just upp-{{input}}-tag {{tag}}; else nix flake update {{input}}; fi
   if [ "{{input}}" = "oh-my-openagent" ]; then just refresh-openagent-bun; fi
 
-syncupp input:
+syncupp input tag='':
   just sync-nixpkgs
-  just upp {{input}}
+  just upp {{input}} {{tag}}
 
 sync-nixpkgs:
   nix flake lock \

@@ -38,8 +38,13 @@ just fmt                     # run nix fmt
 just check                   # run nix flake check
 just up                      # update all flake inputs
 just upp oh-my-openagent     # update one input and refresh Bun metadata when needed
+just upp opencode v1.14.18   # lock one GitHub input to the revision behind a tag
+just upp-oh-my-openagent-tag v3.17.4  # explicit tag-lock helper used behind upp/syncupp
+just syncupp opencode v1.14.18  # sync nixpkgs, then lock/update one input to a tag
 just refresh-openagent-bun   # rebuild pinned bun.nix/bun.lock for the plugin
 ```
+
+When you pass a tag to `upp`/`syncupp`, the command delegates to `upp-<input>-tag`. This is intentionally only implemented for `opencode` and `oh-my-openagent`. The declared input in `flake.nix` still tracks its branch (for example `dev`), so later plain updates continue following that branch.
 
 ## Profiles
 
