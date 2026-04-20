@@ -59,8 +59,8 @@
             pkgs.nixd
             pkgs.marksman
             pkgs.vscode-langservers-extracted
-            pkgs.nodePackages.bash-language-server
-            pkgs.nodePackages.yaml-language-server
+            pkgs.bash-language-server
+            pkgs.yaml-language-server
           ];
 
           baselineLspPath = pkgs.lib.makeBinPath baselineLsps;
