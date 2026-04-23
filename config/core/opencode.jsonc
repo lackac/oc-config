@@ -4,6 +4,11 @@
   "small_model": "opencode/claude-haiku-4-5",
   "model": "openai/gpt-5.4",
   "default_agent": "plan",
+  "permission": {
+    "external_directory": {
+      "/tmp/opencode/**": "allow"
+    }
+  },
   "lsp": {
     "json-ls": {
       "command": ["vscode-json-language-server", "--stdio"],

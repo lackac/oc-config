@@ -70,6 +70,21 @@
 
           baselineLspPath = pkgs.lib.makeBinPath baselineLsps;
 
+          mkWrappedOpencodeBinary =
+            {
+              binName,
+              configDir,
+            }:
+            ''
+              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/${binName}" \
+                --run 'mkdir -p /tmp/opencode' \
+                --set OPENCODE_CONFIG_DIR ${configDir} \
+                --set TMPDIR /tmp/opencode \
+                --set BUN_TMPDIR /tmp/opencode \
+                --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
+                --suffix PATH : ${baselineLspPath}
+            '';
+
           ohMyOpenagentDeps = bun2nixPkg.fetchBunDeps {
             bunNix = ./nix/oh-my-openagent/bun.nix;
           };
@@ -133,20 +148,20 @@
             pname = "opencode-profile-custom";
             version = "unstable";
             dontUnpack = true;
-            nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
+            nativeBuildInputs = [ pkgs.makeWrapper ];
 
             installPhase = ''
               mkdir -p "$out/bin"
 
-              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/opencode" \
-                --set OPENCODE_CONFIG_DIR ${coreConfigDir} \
-                --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
-                --suffix PATH : ${baselineLspPath}
+              ${mkWrappedOpencodeBinary {
+                binName = "opencode";
+                configDir = coreConfigDir;
+              }}
 
-              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/oc" \
-                --set OPENCODE_CONFIG_DIR ${coreConfigDir} \
-                --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
-                --suffix PATH : ${baselineLspPath}
+              ${mkWrappedOpencodeBinary {
+                binName = "oc";
+                configDir = coreConfigDir;
+              }}
             '';
 
             meta = {
@@ -160,20 +175,20 @@
             pname = "opencode-profile-omo";
             version = "unstable";
             dontUnpack = true;
-            nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
+            nativeBuildInputs = [ pkgs.makeWrapper ];
 
             installPhase = ''
               mkdir -p "$out/bin"
 
-              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/oh-my-openagent" \
-                --set OPENCODE_CONFIG_DIR ${ohMyOpenagentConfigDir} \
-                --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
-                --suffix PATH : ${baselineLspPath}
+              ${mkWrappedOpencodeBinary {
+                binName = "oh-my-openagent";
+                configDir = ohMyOpenagentConfigDir;
+              }}
 
-              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/omo" \
-                --set OPENCODE_CONFIG_DIR ${ohMyOpenagentConfigDir} \
-                --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
-                --suffix PATH : ${baselineLspPath}
+              ${mkWrappedOpencodeBinary {
+                binName = "omo";
+                configDir = ohMyOpenagentConfigDir;
+              }}
             '';
 
             meta = {

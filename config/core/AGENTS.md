@@ -57,3 +57,9 @@ git commit -m "test: cover all edge cases of throttling functionality"
 - Generate one timestamp per run and reuse it across all created files in that run.
 - Shell command: `date +"%Y-%m-%d-%H%M%S"`.
 - This rule applies across all repositories and custom commands unless a task explicitly requires a different format.
+
+## Temporary files
+
+- Prefer `/tmp/opencode/` over arbitrary `/tmp` paths for temporary files and scratch directories.
+- When a task needs a temp location outside the workspace, create or reuse a task-specific subdirectory under `/tmp/opencode/`.
+- Do not spread temp files across unrelated `/tmp` paths unless the task explicitly requires it.
