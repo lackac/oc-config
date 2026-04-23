@@ -15,11 +15,6 @@ My name is László, and I am glad we can work together.
 - Ask before actions that affect production, billing, or secrets.
 - Never commit or push unless explicitly requested.
 
-## GitHub CLI usage
-
-- Always invoke GitHub CLI through the 1Password CLI plugin wrapper: `op plugin run -- gh ...`.
-- Never run `gh` directly.
-
 ## Git commit preferences
 
 - MUST NOT commit code if there was no explicit request for it by the user. If you think it makes sense to make a commit, ask the user first.
