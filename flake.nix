@@ -53,9 +53,14 @@
               OPENCODE_CHANNEL = "stable";
             };
             postPatch = (old.postPatch or "") + ''
+              substituteInPlace packages/opencode/src/plugin/codex.ts \
+                --replace-fail $'          if (allowedModels.has(model.api.id)) continue\n          delete provider.models[modelId]' \
+                               $'          if (allowedModels.has(model.api.id)) continue\n          const match = model.api.id.match(/^gpt-(\\d+\\.\\d+)/)\n          if (match && parseFloat(match[1]) > 5.4) continue\n          delete provider.models[modelId]'
+
               substituteInPlace packages/opencode/src/cli/cmd/generate.ts \
                 --replace-fail $'    // Format through prettier so output is byte-identical to committed file\n    // regardless of whether ./script/format.ts runs afterward.\n    const prettier = await import("prettier")\n    const babel = await import("prettier/plugins/babel")\n    const estree = await import("prettier/plugins/estree")\n    const format = prettier.format ?? prettier.default?.format\n    const json = await format(raw, {\n      parser: "json",\n      plugins: [babel.default ?? babel, estree.default ?? estree],\n      printWidth: 120,\n    })' \
                                $'    const json = raw'
+
             '';
           });
 
