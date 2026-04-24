@@ -61,6 +61,10 @@
                 --replace-fail $'    // Format through prettier so output is byte-identical to committed file\n    // regardless of whether ./script/format.ts runs afterward.\n    const prettier = await import("prettier")\n    const babel = await import("prettier/plugins/babel")\n    const estree = await import("prettier/plugins/estree")\n    const format = prettier.format ?? prettier.default?.format\n    const json = await format(raw, {\n      parser: "json",\n      plugins: [babel.default ?? babel, estree.default ?? estree],\n      printWidth: 120,\n    })' \
                                $'    const json = raw'
 
+              substituteInPlace packages/opencode/src/cli/cmd/tui/util/terminal.ts \
+                --replace-fail '  const luminance = (0.299 * background.r + 0.587 * background.g + 0.114 * background.b) / 255' \
+                               '  const luminance = 0.299 * background.r + 0.587 * background.g + 0.114 * background.b'
+
             '';
           });
 
