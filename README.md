@@ -48,6 +48,6 @@ When you pass a tag to `upp`/`syncupp`, the command delegates to `upp-<input>-ta
 
 ## Profiles
 
-The core profile in `config/core/opencode.jsonc` uses `openai/gpt-5.4` as the main model and defaults to the `plan` agent.
+The core profile is defined in `config/core/`. Treat that directory as the source of truth for OpenCode settings, agent guidance, TUI preferences, and user-installed skills.
 
-The OMO profile is assembled during the flake build. It starts from the core config, switches the default agent to `sisyphus`, adds `config/oh-my-openagent/oh-my-openagent.jsonc`, and mounts the built Oh My OpenAgent plugin under `plugins/oh-my-openagent.js`.
+The OMO profile is assembled during the flake build. It layers the Oh My OpenAgent configuration from `config/oh-my-openagent/` onto the core profile and mounts the built plugin into the generated config directory.
