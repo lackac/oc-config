@@ -12,7 +12,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     oh-my-openagent = {
-      url = "github:code-yeongyu/oh-my-openagent/dev";
+      url = "git+https://github.com/code-yeongyu/oh-my-openagent?ref=dev&submodules=1";
       flake = false;
     };
     treefmt-nix = {
@@ -91,6 +91,19 @@
             bunNix = ./nix/oh-my-openagent/bun.nix;
           };
 
+          lspToolsMcp = pkgs.buildNpmPackage {
+            pname = "lsp-tools-mcp";
+            version = "unstable";
+            src = oh-my-openagent + "/packages/lsp-tools-mcp";
+            npmDepsHash = "sha256-P2xzDhZg8DslkajX+eI7OeIvzTkoTVWERH7v0dMfIXg=";
+            nativeBuildInputs = [ pkgs.python3 ];
+            dontNpmBuild = false;
+            postInstall = ''
+              mkdir -p $out/dist
+              cp -R dist/* $out/dist/
+            '';
+          };
+
           ohMyOpenagentPlugin = pkgs.stdenvNoCC.mkDerivation {
             pname = "oh-my-openagent-plugin";
             version = "unstable";
@@ -117,6 +130,8 @@
               mkdir -p "$out/lib/oh-my-openagent"
               cp -R dist "$out/lib/oh-my-openagent/"
               cp -R node_modules "$out/lib/oh-my-openagent/"
+              mkdir -p "$out/lib/oh-my-openagent/dist/packages/lsp-tools-mcp"
+              cp -R ${lspToolsMcp}/dist "$out/lib/oh-my-openagent/dist/packages/lsp-tools-mcp/dist"
               runHook postInstall
             '';
           };
@@ -178,6 +193,9 @@
             version = "unstable";
             dontUnpack = true;
             nativeBuildInputs = [ pkgs.makeWrapper ];
+            passthru = {
+              inherit ohMyOpenagentPlugin;
+            };
 
             installPhase = ''
               mkdir -p "$out/bin"
@@ -205,6 +223,7 @@
           default = wrappedOpencode;
           opencode = wrappedOpencode;
           "oh-my-openagent" = wrappedOhMyOpenagent;
+          "lsp-tools-mcp" = lspToolsMcp;
         }
       );
 
@@ -243,6 +262,15 @@
                 mkdir -p "$out"
               '';
 
+          oh-my-openagent-lsp-mcp-path = pkgs.runCommand "oh-my-openagent-lsp-mcp-path-check" { } ''
+            if [ ! -f "${
+              self.packages.${system}."oh-my-openagent".ohMyOpenagentPlugin
+            }/lib/oh-my-openagent/dist/packages/lsp-tools-mcp/dist/cli.js" ]; then
+              echo "Error: cli.js not found at expected path"
+              exit 1
+            fi
+            mkdir -p "$out"
+          '';
         }
       );
     };
