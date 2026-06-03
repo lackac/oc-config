@@ -55,7 +55,11 @@
             )
           );
           patchedOpencode = opencode.packages.${system}.opencode.overrideAttrs (old: {
-            patches = (old.patches or [ ]) ++ opencodePatches;
+            src = pkgs.applyPatches {
+              name = "opencode-patched-source";
+              src = old.src;
+              patches = opencodePatches;
+            };
             env = (old.env or { }) // {
               OPENCODE_CHANNEL = "stable";
             };
