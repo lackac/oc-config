@@ -91,15 +91,25 @@
                 --suffix PATH : ${baselineLspPath}
             '';
 
+          ohMyOpenagentBunNix =
+            args@{
+              copyPathToStore,
+              fetchFromGitHub,
+              fetchgit,
+              fetchurl,
+              ...
+            }:
+            import ./nix/oh-my-openagent/bun.nix (args // { ohMyOpenagent = oh-my-openagent; });
+
           ohMyOpenagentDeps = bun2nixPkg.fetchBunDeps {
-            bunNix = ./nix/oh-my-openagent/bun.nix;
+            bunNix = ohMyOpenagentBunNix;
           };
 
           lspToolsMcp = pkgs.buildNpmPackage {
             pname = "lsp-tools-mcp";
             version = "unstable";
             src = oh-my-openagent + "/packages/lsp-tools-mcp";
-            npmDepsHash = "sha256-P2xzDhZg8DslkajX+eI7OeIvzTkoTVWERH7v0dMfIXg=";
+            npmDepsHash = "sha256-y8F+nZGIT/wnTZJSqWfLWJvVroFUAF55Nq0bv6Im1mU=";
             nativeBuildInputs = [ pkgs.python3 ];
             dontNpmBuild = false;
             postInstall = ''
@@ -133,6 +143,7 @@
               runHook preInstall
               mkdir -p "$out/lib/oh-my-openagent"
               cp -R dist "$out/lib/oh-my-openagent/"
+              cp -R packages "$out/lib/oh-my-openagent/"
               cp -R node_modules "$out/lib/oh-my-openagent/"
               mkdir -p "$out/lib/oh-my-openagent/dist/packages/lsp-tools-mcp"
               cp -R ${lspToolsMcp}/dist "$out/lib/oh-my-openagent/dist/packages/lsp-tools-mcp/dist"
