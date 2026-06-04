@@ -9,6 +9,8 @@ This repository packages two managed OpenCode entry points with Nix:
 
 The flake wraps the upstream `opencode` binary, injects repository-managed config, disables on-demand LSP downloads, and puts a baseline set of language servers on `PATH`.
 
+The wrappers also put [`beadwork`](https://github.com/jallum/beadwork)'s `bw` CLI on `PATH` for agentic project workflows. This repository only makes the tool available; projects opt in through their own `AGENTS.md` or other agent instruction files.
+
 ## What is in here
 
 - `flake.nix`: builds the wrapped binaries, dev shell, formatter, and checks
@@ -51,3 +53,16 @@ When you pass a tag to `upp`/`syncupp`, the command delegates to `upp-<input>-ta
 The core profile is defined in `config/core/`. Treat that directory as the source of truth for OpenCode settings, agent guidance, TUI preferences, and user-installed skills.
 
 The OMO profile is assembled during the flake build. It layers the Oh My OpenAgent configuration from `config/oh-my-openagent/` onto the core profile and mounts the built plugin into the generated config directory.
+
+## Beadwork
+
+Both managed profiles expose `bw`, the Beadwork CLI, so agents can use it when a project asks for that workflow. The global `config/core/AGENTS.md` intentionally does not mention Beadwork; enabling it is a project-level decision.
+
+To set up a new project, initialize Beadwork in that repository and copy its onboarding guidance into the project's agent instructions:
+
+```bash
+bw init
+bw onboard
+```
+
+Then add the relevant `bw onboard` output to the project's `AGENTS.md`. For projects that opt in, the usual session-start instruction is to run `bw prime` before selecting or updating work.

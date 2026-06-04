@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "beadwork": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1780241925,
+        "narHash": "sha256-eP3+0GHVhDEj+Q1mHjO1/OFvoygoj2eTPz2Piwrhwt4=",
+        "owner": "jallum",
+        "repo": "beadwork",
+        "rev": "ad6b252969fdd4b028f63aa38b2d360433121389",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jallum",
+        "repo": "beadwork",
+        "type": "github"
+      }
+    },
     "bun2nix": {
       "inputs": {
         "flake-parts": "flake-parts",
@@ -130,6 +146,7 @@
     },
     "root": {
       "inputs": {
+        "beadwork": "beadwork",
         "bun2nix": "bun2nix",
         "nixpkgs": "nixpkgs",
         "oh-my-openagent": "oh-my-openagent",

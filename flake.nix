@@ -11,6 +11,10 @@
       url = "github:nix-community/bun2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    beadwork = {
+      url = "github:jallum/beadwork";
+      flake = false;
+    };
     oh-my-openagent = {
       url = "git+https://github.com/code-yeongyu/oh-my-openagent?ref=dev&submodules=1";
       flake = false;
@@ -27,6 +31,7 @@
       nixpkgs,
       opencode,
       bun2nix,
+      beadwork,
       oh-my-openagent,
       treefmt-nix,
       ...
@@ -74,7 +79,21 @@
             pkgs.yaml-language-server
           ];
 
-          baselineLspPath = pkgs.lib.makeBinPath baselineLsps;
+          bw = pkgs.buildGoModule {
+            pname = "bw";
+            version = "unstable";
+            src = beadwork;
+            vendorHash = "sha256-LjqZSI7F3C8GyNrPK/BwG9QTmNg89hFAvhUuBjmbHTU=";
+            subPackages = [ "cmd/bw" ];
+            nativeCheckInputs = [ pkgs.git ];
+          };
+
+          agenticTools = [
+            bw
+            pkgs.git
+          ];
+
+          baselineToolPath = pkgs.lib.makeBinPath (baselineLsps ++ agenticTools);
 
           mkWrappedOpencodeBinary =
             {
@@ -88,7 +107,7 @@
                 --set TMPDIR /tmp/opencode \
                 --set BUN_TMPDIR /tmp/opencode \
                 --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
-                --suffix PATH : ${baselineLspPath}
+                --suffix PATH : ${baselineToolPath}
             '';
 
           ohMyOpenagentBunNix =
@@ -236,6 +255,7 @@
         in
         {
           default = wrappedOpencode;
+          inherit bw;
           opencode = wrappedOpencode;
           "oh-my-openagent" = wrappedOhMyOpenagent;
           "lsp-tools-mcp" = lspToolsMcp;
@@ -250,6 +270,7 @@
         {
           default = pkgs.mkShell {
             packages = [
+              self.packages.${system}.bw
               self.packages.${system}.opencode
               self.packages.${system}."oh-my-openagent"
             ];
