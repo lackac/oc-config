@@ -6,7 +6,12 @@
   "default_agent": "plan",
   "permission": {
     "external_directory": {
-      "/tmp/opencode/**": "allow"
+      "/tmp/opencode/**": "allow",
+      "/private/tmp/opencode/**": "allow",
+      "/nix/store": "allow",
+      "/nix/store/**": "allow",
+      "/Users/lackac/Code/**": "allow",
+      "/Users/lackac/Life/**": "allow"
     }
   },
   "lsp": {
