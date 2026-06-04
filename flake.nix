@@ -71,6 +71,7 @@
 
           baselineLsps = [
             pkgs.ast-grep
+            pkgs.biome
             pkgs.nixd
             pkgs.marksman
             pkgs.vscode-langservers-extracted
