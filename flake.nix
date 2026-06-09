@@ -106,6 +106,7 @@
                 --set OPENCODE_CONFIG_DIR ${configDir} \
                 --set TMPDIR /tmp/opencode \
                 --set BUN_TMPDIR /tmp/opencode \
+                --set OPENCODE_DISABLE_AUTOUPDATE true \
                 --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
                 --suffix PATH : ${baselineToolPath}
             '';
