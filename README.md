@@ -5,9 +5,9 @@ Opinionated OpenCode wrappers and profiles.
 This repository packages two managed OpenCode entry points with Nix:
 
 - `opencode` / `oc`: the core profile from `config/core`
-- `oh-my-openagent` / `omo`: the Oh My OpenAgent profile, built on top of the core profile and wired to the bundled plugin from `config/oh-my-openagent`
+- `oh-my-openagent` / `omo`: the Oh My OpenAgent profile, built on top of the core profile and wired to the plugin package from `llm-agents.nix`
 
-The flake wraps the upstream `opencode` binary, injects repository-managed config, disables on-demand LSP downloads, and puts a baseline set of language servers on `PATH`.
+The flake wraps the `opencode` binary from [`llm-agents.nix`](https://github.com/numtide/llm-agents.nix), injects repository-managed config, disables on-demand LSP downloads, and puts a baseline set of language servers on `PATH`.
 
 The wrappers also put [`beadwork`](https://github.com/jallum/beadwork)'s `bw` CLI on `PATH` for agentic project workflows. This repository only makes the tool available; projects opt in through their own `AGENTS.md` or other agent instruction files.
 
@@ -16,7 +16,6 @@ The wrappers also put [`beadwork`](https://github.com/jallum/beadwork)'s `bw` CL
 - `flake.nix`: builds the wrapped binaries, dev shell, formatter, and checks
 - `config/core/`: base OpenCode config, agent guidance, and user-installed skills
 - `config/oh-my-openagent/`: Oh My OpenAgent profile overrides
-- `nix/oh-my-openagent/`: pinned Bun dependency data for the plugin build
 - `justfile`: common maintenance commands
 
 ## Common workflows
@@ -39,20 +38,17 @@ Useful commands:
 just fmt                     # run nix fmt
 just check                   # run nix flake check
 just up                      # update all flake inputs
-just upp oh-my-openagent     # update one input and refresh Bun metadata when needed
-just upp opencode v1.14.18   # lock one GitHub input to the revision behind a tag
-just upp-oh-my-openagent-tag v3.17.4  # explicit tag-lock helper used behind upp/syncupp
-just syncupp opencode v1.14.18  # sync nixpkgs, then lock/update one input to a tag
-just refresh-openagent-bun   # rebuild pinned bun.nix/bun.lock for the plugin
+just upp llm-agents          # update the agent package set
+just syncupp llm-agents      # sync nixpkgs, then update the agent package set
 ```
 
-When you pass a tag to `upp`/`syncupp`, the command delegates to `upp-<input>-tag`. This is intentionally only implemented for `opencode` and `oh-my-openagent`. The declared input in `flake.nix` still tracks its branch (for example `dev`), so later plain updates continue following that branch.
+OpenCode and Oh My OpenAgent package updates come from the `llm-agents` input. This repository keeps only the wrapper, profile, and project-specific configuration logic.
 
 ## Profiles
 
 The core profile is defined in `config/core/`. Treat that directory as the source of truth for OpenCode settings, agent guidance, TUI preferences, and user-installed skills.
 
-The OMO profile is assembled during the flake build. It layers the Oh My OpenAgent configuration from `config/oh-my-openagent/` onto the core profile and mounts the built plugin into the generated config directory.
+The OMO profile is assembled during the flake build. It layers the Oh My OpenAgent configuration from `config/oh-my-openagent/` onto the core profile and mounts the `llm-agents.nix` plugin package into the generated config directory.
 
 ## Beadwork
 

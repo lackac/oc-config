@@ -3,22 +3,11 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    opencode = {
-      url = "github:anomalyco/opencode/dev";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    bun2nix = {
-      url = "github:nix-community/bun2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     beadwork = {
       url = "github:jallum/beadwork";
       flake = false;
     };
-    oh-my-openagent = {
-      url = "git+https://github.com/code-yeongyu/oh-my-openagent?ref=dev&submodules=1";
-      flake = false;
-    };
+    llm-agents.url = "github:numtide/llm-agents.nix";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -29,10 +18,8 @@
     {
       self,
       nixpkgs,
-      opencode,
-      bun2nix,
       beadwork,
-      oh-my-openagent,
+      llm-agents,
       treefmt-nix,
       ...
     }:
@@ -51,23 +38,9 @@
         system:
         let
           pkgs = pkgsFor system;
-          bun2nixPkg = bun2nix.packages.${system}.default;
-          opencodePatchDir = ./patches/opencode;
-          opencodePatches = map (name: opencodePatchDir + "/${name}") (
-            builtins.filter (name: pkgs.lib.hasSuffix ".patch" name) (
-              builtins.attrNames (builtins.readDir opencodePatchDir)
-            )
-          );
-          patchedOpencode = opencode.packages.${system}.opencode.overrideAttrs (old: {
-            src = pkgs.applyPatches {
-              name = "opencode-patched-source";
-              src = old.src;
-              patches = opencodePatches;
-            };
-            env = (old.env or { }) // {
-              OPENCODE_CHANNEL = "stable";
-            };
-          });
+          llmAgentPackages = llm-agents.packages.${system};
+          opencodePackage = llmAgentPackages.opencode;
+          ohMyOpencodePlugin = llmAgentPackages."oh-my-opencode";
 
           baselineLsps = [
             pkgs.ast-grep
@@ -101,7 +74,7 @@
               configDir,
             }:
             ''
-              makeWrapper ${patchedOpencode}/bin/opencode "$out/bin/${binName}" \
+              makeWrapper ${opencodePackage}/bin/opencode "$out/bin/${binName}" \
                 --run 'mkdir -p /tmp/opencode' \
                 --set OPENCODE_CONFIG_DIR ${configDir} \
                 --set TMPDIR /tmp/opencode \
@@ -110,66 +83,6 @@
                 --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
                 --suffix PATH : ${baselineToolPath}
             '';
-
-          ohMyOpenagentBunNix =
-            args@{
-              copyPathToStore,
-              fetchFromGitHub,
-              fetchgit,
-              fetchurl,
-              ...
-            }:
-            import ./nix/oh-my-openagent/bun.nix (args // { ohMyOpenagent = oh-my-openagent; });
-
-          ohMyOpenagentDeps = bun2nixPkg.fetchBunDeps {
-            bunNix = ohMyOpenagentBunNix;
-          };
-
-          lspToolsMcp = pkgs.buildNpmPackage {
-            pname = "lsp-tools-mcp";
-            version = "unstable";
-            src = oh-my-openagent + "/packages/lsp-tools-mcp";
-            npmDepsHash = "sha256-y8F+nZGIT/wnTZJSqWfLWJvVroFUAF55Nq0bv6Im1mU=";
-            nativeBuildInputs = [ pkgs.python3 ];
-            dontNpmBuild = false;
-            postInstall = ''
-              mkdir -p $out/dist
-              cp -R dist/* $out/dist/
-            '';
-          };
-
-          ohMyOpenagentPlugin = pkgs.stdenvNoCC.mkDerivation {
-            pname = "oh-my-openagent-plugin";
-            version = "unstable";
-            src = oh-my-openagent;
-
-            nativeBuildInputs = [
-              bun2nixPkg.hook
-              pkgs.bun
-            ];
-
-            bunDeps = ohMyOpenagentDeps;
-            dontRunLifecycleScripts = true;
-            dontUseBunBuild = true;
-            dontUseBunInstall = true;
-
-            buildPhase = ''
-              runHook preBuild
-              bun run build
-              runHook postBuild
-            '';
-
-            installPhase = ''
-              runHook preInstall
-              mkdir -p "$out/lib/oh-my-openagent"
-              cp -R dist "$out/lib/oh-my-openagent/"
-              cp -R packages "$out/lib/oh-my-openagent/"
-              cp -R node_modules "$out/lib/oh-my-openagent/"
-              mkdir -p "$out/lib/oh-my-openagent/dist/packages/lsp-tools-mcp"
-              cp -R ${lspToolsMcp}/dist "$out/lib/oh-my-openagent/dist/packages/lsp-tools-mcp/dist"
-              runHook postInstall
-            '';
-          };
 
           coreConfigDir = pkgs.runCommand "opencode-config-core" { } ''
             mkdir -p "$out"
@@ -190,7 +103,7 @@
                 mkdir -p "$out/plugins"
 
                 cat > "$out/plugins/oh-my-openagent.js" <<'EOF'
-                import plugin from "${ohMyOpenagentPlugin}/lib/oh-my-openagent/dist/index.js"
+                import plugin from "${ohMyOpencodePlugin}/lib/oh-my-opencode/dist/index.js"
 
                 export default plugin
                 EOF
@@ -229,7 +142,7 @@
             dontUnpack = true;
             nativeBuildInputs = [ pkgs.makeWrapper ];
             passthru = {
-              inherit ohMyOpenagentPlugin;
+              inherit ohMyOpencodePlugin;
             };
 
             installPhase = ''
@@ -259,7 +172,6 @@
           inherit bw;
           opencode = wrappedOpencode;
           "oh-my-openagent" = wrappedOhMyOpenagent;
-          "lsp-tools-mcp" = lspToolsMcp;
         }
       );
 
@@ -289,20 +201,17 @@
         {
           formatting = treefmtEval.${system}.config.build.check self;
 
-          oh-my-openagent-lockfile =
-            pkgs.runCommand "oh-my-openagent-lockfile-check"
-              {
-                nativeBuildInputs = [ pkgs.diffutils ];
-              }
-              ''
-                diff -u ${oh-my-openagent}/bun.lock ${./nix/oh-my-openagent/bun.lock}
-                mkdir -p "$out"
-              '';
-
-          oh-my-openagent-lsp-mcp-path = pkgs.runCommand "oh-my-openagent-lsp-mcp-path-check" { } ''
+          oh-my-openagent-plugin-layout = pkgs.runCommand "oh-my-openagent-plugin-layout-check" { } ''
             if [ ! -f "${
-              self.packages.${system}."oh-my-openagent".ohMyOpenagentPlugin
-            }/lib/oh-my-openagent/dist/packages/lsp-tools-mcp/dist/cli.js" ]; then
+              self.packages.${system}."oh-my-openagent".ohMyOpencodePlugin
+            }/lib/oh-my-opencode/dist/index.js" ]; then
+              echo "Error: plugin index.js not found at expected path"
+              exit 1
+            fi
+
+            if [ ! -f "${
+              self.packages.${system}."oh-my-openagent".ohMyOpencodePlugin
+            }/lib/oh-my-opencode/packages/lsp-tools-mcp/dist/cli.js" ]; then
               echo "Error: cli.js not found at expected path"
               exit 1
             fi
