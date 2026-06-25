@@ -107,15 +107,20 @@
               ''
                 mkdir -p "$out"
                 cp -R ${./config/core}/. "$out/"
-                jq '.default_agent = "sisyphus"' "$out/opencode.jsonc" > "$out/opencode.jsonc.tmp"
+                jq --arg plugin "$out/plugins/oh-my-openagent.js" '.default_agent = "sisyphus" | .plugin = ((.plugin // []) + [$plugin])' "$out/opencode.jsonc" > "$out/opencode.jsonc.tmp"
                 mv "$out/opencode.jsonc.tmp" "$out/opencode.jsonc"
                 cp ${./config/oh-my-openagent/oh-my-openagent.jsonc} "$out/oh-my-opencode.jsonc"
+                cp -R ${ohMyOpencodePlugin}/lib/oh-my-opencode "$out/oh-my-opencode"
+                chmod -R u+w "$out/oh-my-opencode"
+                ln -s "$out/oh-my-opencode/packages/shared-skills/skills" "$out/oh-my-opencode/dist/skills"
+                substituteInPlace "$out/oh-my-opencode/dist/index.js" \
+                  --replace-fail 'var __require = import.meta.require;' 'var __require = import.meta.require ?? createRequire(import.meta.url);'
                 mkdir -p "$out/plugins"
 
-                cat > "$out/plugins/oh-my-openagent.js" <<'EOF'
-                import plugin from "${ohMyOpencodePlugin}/lib/oh-my-opencode/dist/index.js"
+                cat > "$out/plugins/oh-my-openagent.js" <<EOF
+                import plugin from "$out/oh-my-opencode/dist/index.js"
 
-                export default plugin
+                export default plugin.server
                 EOF
               '';
 
@@ -221,7 +226,7 @@
 
             if [ ! -f "${
               self.packages.${system}."oh-my-openagent".ohMyOpencodePlugin
-            }/lib/oh-my-opencode/packages/lsp-tools-mcp/dist/cli.js" ]; then
+            }/lib/oh-my-opencode/packages/lsp-daemon/dist/cli.js" ]; then
               echo "Error: cli.js not found at expected path"
               exit 1
             fi
