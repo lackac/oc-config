@@ -9,7 +9,7 @@ This repository packages two managed OpenCode entry points with Nix:
 
 The flake wraps the `opencode` binary from [`llm-agents.nix`](https://github.com/numtide/llm-agents.nix), injects repository-managed config, disables on-demand LSP downloads, and puts a baseline set of language servers on `PATH`.
 
-The wrappers also put [`beadwork`](https://github.com/jallum/beadwork)'s `bw` CLI on `PATH` for agentic project workflows. This repository only makes the tool available; projects opt in through their own `AGENTS.md` or other agent instruction files.
+The wrappers also provide [`beadwork`](https://github.com/jallum/beadwork)'s `bw` CLI and [`Hunk`](https://github.com/modem-dev/hunk) for agentic project workflows and interactive diff review. Projects opt into Beadwork through their own `AGENTS.md` or other agent instruction files.
 
 ## What is in here
 
@@ -62,3 +62,13 @@ bw onboard
 ```
 
 Then add the relevant `bw onboard` output to the project's `AGENTS.md`. For projects that opt in, the usual session-start instruction is to run `bw prime` before selecting or updating work.
+
+## Hunk
+
+Both managed profiles include the `hunk` executable and its `hunk-review` skill. Start a review in another terminal, then ask the agent to use the live session:
+
+```bash
+hunk diff
+```
+
+The agent can inspect the changes, navigate the review, and exchange inline comments through Hunk's local session daemon.

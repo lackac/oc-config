@@ -49,6 +49,7 @@
         let
           pkgs = pkgsFor system;
           llmAgentPackages = llm-agents.packages.${system};
+          hunk = llmAgentPackages.hunk;
           opencodePackage = llmAgentPackages.opencode;
           ohMyOpencodePlugin = llmAgentPackages."oh-my-opencode";
 
@@ -73,6 +74,7 @@
 
           agenticTools = [
             bw
+            hunk
             pkgs.git
           ];
 
@@ -97,6 +99,8 @@
           coreConfigDir = pkgs.runCommand "opencode-config-core" { } ''
             mkdir -p "$out"
             cp -R ${./config/core}/. "$out/"
+            chmod u+w "$out/skills"
+            ln -s ${hunk}/skills/hunk-review "$out/skills/hunk-review"
           '';
 
           ohMyOpenagentConfigDir =
@@ -107,6 +111,8 @@
               ''
                 mkdir -p "$out"
                 cp -R ${./config/core}/. "$out/"
+                chmod u+w "$out/skills"
+                ln -s ${hunk}/skills/hunk-review "$out/skills/hunk-review"
                 jq --arg plugin "$out/plugins/oh-my-openagent.js" '.default_agent = "sisyphus" | .plugin = ((.plugin // []) + [$plugin])' "$out/opencode.jsonc" > "$out/opencode.jsonc.tmp"
                 mv "$out/opencode.jsonc.tmp" "$out/opencode.jsonc"
                 cp ${./config/oh-my-openagent/oh-my-openagent.jsonc} "$out/oh-my-opencode.jsonc"
@@ -132,6 +138,7 @@
 
             installPhase = ''
               mkdir -p "$out/bin"
+              ln -s ${hunk}/bin/hunk "$out/bin/hunk"
 
               ${mkWrappedOpencodeBinary {
                 binName = "opencode";
@@ -162,6 +169,7 @@
 
             installPhase = ''
               mkdir -p "$out/bin"
+              ln -s ${hunk}/bin/hunk "$out/bin/hunk"
 
               ${mkWrappedOpencodeBinary {
                 binName = "oh-my-openagent";
@@ -184,7 +192,7 @@
         in
         {
           default = wrappedOpencode;
-          inherit bw;
+          inherit bw hunk;
           opencode = wrappedOpencode;
           "oh-my-openagent" = wrappedOhMyOpenagent;
         }
@@ -199,6 +207,7 @@
           default = pkgs.mkShell {
             packages = [
               self.packages.${system}.bw
+              self.packages.${system}.hunk
               self.packages.${system}.opencode
               self.packages.${system}."oh-my-openagent"
             ];
