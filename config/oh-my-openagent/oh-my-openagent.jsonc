@@ -13,11 +13,11 @@
   "agents": {
     // Main orchestrator for multi-step coordination, delegation, and codebase-wide execution.
     "sisyphus": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "medium",
       "fallback_models": [
         "github-copilot/claude-opus-4.7",
-        "openai/gpt-5.4",
+        "openai/gpt-5.6-terra",
         "github-copilot/claude-sonnet-4.6",
         "opencode/claude-sonnet-4-6",
         "github-copilot/claude-haiku-4.5"
@@ -26,30 +26,29 @@
     },
     // Strategic planner for interview-style planning and high-level architecture shaping.
     "prometheus": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "high",
       "fallback_models": [
         "github-copilot/claude-opus-4.7",
-        "openai/gpt-5.4",
+        "openai/gpt-5.6-terra",
         "github-copilot/claude-sonnet-4.6"
       ]
     },
     // Plan gap analyzer for finding missing steps and weak assumptions before execution.
     "metis": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "high",
       "fallback_models": [
         "github-copilot/claude-opus-4.7",
-        "openai/gpt-5.4",
+        "openai/gpt-5.6-terra",
         "github-copilot/claude-sonnet-4.6"
       ]
     },
     // Todo orchestrator for sequencing task items and driving execution across steps.
     "atlas": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-terra",
       "fallback_models": [
         "github-copilot/claude-sonnet-4.6",
-        "openai/gpt-5.4",
         "opencode/claude-sonnet-4-6",
         "github-copilot/claude-haiku-4.5"
       ]
@@ -57,41 +56,42 @@
 
     // Autonomous deep worker for long, independent coding sessions across complex codebases.
     "hephaestus": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "high",
       "fallback_models": [
         "github-copilot/gpt-5.3-codex",
-        "openai/gpt-5.4",
+        "openai/gpt-5.6-terra",
         "github-copilot/claude-sonnet-4.6"
       ]
     },
     // Read-only architecture consultant for high-stakes design and debugging judgment.
     "oracle": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "high",
       "fallback_models": [
         "github-copilot/gpt-5.2",
         "github-copilot/gpt-5.3-codex",
-        "openai/gpt-5.4",
+        "openai/gpt-5.6-terra",
         "github-copilot/claude-sonnet-4.6"
       ]
     },
     // Ruthless reviewer for plan review, QA thinking, and critical verification passes.
     "momus": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "xhigh",
       "fallback_models": [
         "github-copilot/gpt-5.3-codex",
-        "openai/gpt-5.4",
+        "openai/gpt-5.6-terra",
         "github-copilot/claude-sonnet-4.6"
       ]
     },
 
     // Fast codebase grep runner for parallel repo search and pattern discovery.
     "explore": {
-      "model": "github-copilot/gemini-3-flash-preview",
+      "model": "openai/gpt-5.6-luna",
       "fallback_models": [
-        "openai/gpt-5.4-mini",
+        "openai/gpt-5.6-terra",
+        "github-copilot/gemini-3-flash-preview",
         "github-copilot/gpt-5-mini",
         "github-copilot/claude-haiku-4.5",
         "opencode/gpt-5.4-nano"
@@ -99,7 +99,7 @@
     },
     // Docs and external code search agent for pulling references from outside the repo.
     "librarian": {
-      "model": "openai/gpt-5.4-mini",
+      "model": "openai/gpt-5.6-terra",
       "fallback_models": [
         "github-copilot/gemini-3-flash-preview",
         "github-copilot/claude-haiku-4.5",
@@ -109,28 +109,29 @@
 
     // Vision agent for screenshots, image analysis, and other multimodal inspection tasks.
     "multimodal-looker": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "medium",
       "fallback_models": [
         "github-copilot/gemini-3.1-pro-preview",
         "github-copilot/gemini-3-flash-preview",
-        "openai/gpt-5.4"
+        "openai/gpt-5.6-terra"
       ]
     }
   },
 
   "categories": {
     "quick": {
-      "model": "github-copilot/gemini-3-flash-preview",
+      "model": "openai/gpt-5.6-luna",
       "fallback_models": [
-        "openai/gpt-5.4-mini",
+        "openai/gpt-5.6-terra",
+        "github-copilot/gemini-3-flash-preview",
         "github-copilot/gpt-5-mini",
         "github-copilot/claude-haiku-4.5",
         "opencode/gpt-5.4-nano"
       ]
     },
     "unspecified-low": {
-      "model": "openai/gpt-5.4-mini",
+      "model": "openai/gpt-5.6-terra",
       "reasoningEffort": "medium",
       "fallback_models": [
         "github-copilot/gpt-5.3-codex",
@@ -138,33 +139,33 @@
       ]
     },
     "unspecified-high": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "high",
       "fallback_models": [
         "github-copilot/claude-sonnet-4.6",
-        "openai/gpt-5.4"
+        "openai/gpt-5.6-terra"
       ]
     },
     "deep": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "medium",
       "fallback_models": [
         "github-copilot/gpt-5.3-codex",
-        "openai/gpt-5.4",
+        "openai/gpt-5.6-terra",
         "github-copilot/claude-sonnet-4.6"
       ]
     },
     "ultrabrain": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "xhigh",
       "fallback_models": [
         "github-copilot/claude-opus-4.7",
-        "openai/gpt-5.4",
+        "openai/gpt-5.6-terra",
         "github-copilot/gpt-5.3-codex"
       ]
     },
     "writing": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "fallback_models": [
         "github-copilot/gpt-5.4",
         "github-copilot/claude-sonnet-4.6"
@@ -174,13 +175,13 @@
       "model": "github-copilot/gemini-3.1-pro-preview",
       "variant": "high",
       "fallback_models": [
-        "openai/gpt-5.5",
+        "openai/gpt-5.6-sol",
         "github-copilot/claude-opus-4.7",
         "opencode/claude-sonnet-4-6"
       ]
     },
     "artistry": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "fallback_models": [
         "github-copilot/claude-opus-4.7",
         "openai/gpt-5.2",
@@ -189,10 +190,10 @@
     },
 
     "git": {
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol",
       "fallback_models": [
         "github-copilot/gpt-5.3-codex",
-        "openai/gpt-5.4",
+        "openai/gpt-5.6-terra",
         "opencode/gpt-5.4-nano"
       ],
       "description": "All git operations",
@@ -207,9 +208,9 @@
       "opencode": 2
     },
     "modelConcurrency": {
-      "openai/gpt-5.5": 4,
-      "openai/gpt-5.4": 4,
-      "openai/gpt-5.4-mini": 6,
+      "openai/gpt-5.6-sol": 4,
+      "openai/gpt-5.6-terra": 4,
+      "openai/gpt-5.6-luna": 6,
       "github-copilot/gpt-5.3-codex": 4,
       "github-copilot/gpt-5-mini": 6,
       "github-copilot/gemini-3.1-pro-preview": 2,
