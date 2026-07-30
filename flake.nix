@@ -49,9 +49,9 @@
         let
           pkgs = pkgsFor system;
           llmAgentPackages = llm-agents.packages.${system};
-          hunk = llmAgentPackages.hunk;
           opencodePackage = llmAgentPackages.opencode;
           ohMyOpencodePlugin = llmAgentPackages."oh-my-opencode";
+          tuicr = llmAgentPackages.tuicr;
 
           baselineLsps = [
             pkgs.ast-grep
@@ -74,8 +74,8 @@
 
           agenticTools = [
             bw
-            hunk
             pkgs.git
+            tuicr
           ];
 
           baselineToolPath = pkgs.lib.makeBinPath (baselineLsps ++ agenticTools);
@@ -100,7 +100,7 @@
             mkdir -p "$out"
             cp -R ${./config/core}/. "$out/"
             chmod u+w "$out/skills"
-            ln -s ${hunk}/skills/hunk-review "$out/skills/hunk-review"
+            ln -s ${tuicr.src}/skills/tuicr "$out/skills/tuicr"
           '';
 
           ohMyOpenagentConfigDir =
@@ -112,7 +112,7 @@
                 mkdir -p "$out"
                 cp -R ${./config/core}/. "$out/"
                 chmod u+w "$out/skills"
-                ln -s ${hunk}/skills/hunk-review "$out/skills/hunk-review"
+                ln -s ${tuicr.src}/skills/tuicr "$out/skills/tuicr"
                 jq --arg plugin "$out/plugins/oh-my-openagent.js" '.default_agent = "sisyphus" | .plugin = ((.plugin // []) + [$plugin])' "$out/opencode.jsonc" > "$out/opencode.jsonc.tmp"
                 mv "$out/opencode.jsonc.tmp" "$out/opencode.jsonc"
                 cp ${./config/oh-my-openagent/oh-my-openagent.jsonc} "$out/oh-my-opencode.jsonc"
@@ -138,7 +138,7 @@
 
             installPhase = ''
               mkdir -p "$out/bin"
-              ln -s ${hunk}/bin/hunk "$out/bin/hunk"
+              ln -s ${tuicr}/bin/tuicr "$out/bin/tuicr"
 
               ${mkWrappedOpencodeBinary {
                 binName = "opencode";
@@ -169,7 +169,7 @@
 
             installPhase = ''
               mkdir -p "$out/bin"
-              ln -s ${hunk}/bin/hunk "$out/bin/hunk"
+              ln -s ${tuicr}/bin/tuicr "$out/bin/tuicr"
 
               ${mkWrappedOpencodeBinary {
                 binName = "oh-my-openagent";
@@ -192,7 +192,7 @@
         in
         {
           default = wrappedOpencode;
-          inherit bw hunk;
+          inherit bw tuicr;
           opencode = wrappedOpencode;
           "oh-my-openagent" = wrappedOhMyOpenagent;
         }
@@ -207,9 +207,9 @@
           default = pkgs.mkShell {
             packages = [
               self.packages.${system}.bw
-              self.packages.${system}.hunk
               self.packages.${system}.opencode
               self.packages.${system}."oh-my-openagent"
+              self.packages.${system}.tuicr
             ];
           };
         }
