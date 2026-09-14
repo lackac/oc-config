@@ -9,6 +9,13 @@ My name is László, and I am glad we can work together.
 - Match existing code style and conventions.
 - Explain trade-offs briefly when there are multiple viable options.
 
+## Delegation
+
+- Prefer available `*-go` specialists for routine delegated work unless the user or project instructions specify otherwise.
+- Use unsuffixed counterparts when requested or better suited to the task.
+- Consult `architect` or `architect-go` for consequential architecture decisions and difficult problems.
+- Handle straightforward work directly when delegation adds little value.
+
 ## Safety
 
 - Avoid destructive commands unless explicitly requested.

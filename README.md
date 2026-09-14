@@ -16,6 +16,58 @@ The wrapper also provides [`tuicr`](https://github.com/agavra/tuicr) for interac
 - `config/core/`: base OpenCode config, agent guidance, and user-installed skills
 - `justfile`: common maintenance commands
 
+## Agent models
+
+The core profile uses OpenAI subscription models for its primary agents:
+
+- Plan: GPT-5.6 Sol with medium reasoning
+- Build: GPT-5.6 Terra with medium reasoning
+
+It provides paired specialist subagents. Unsuffixed `architect` and `general`
+use OpenAI subscription models; `explore`, `scout`, and `designer` use
+GPT-5.6 Luna from OpenCode Go to spare Plus quota. `*-go` agents use
+zero-day-retention models from OpenCode Go, except Go-provided Luna which
+retains abuse-monitoring logs for up to 30 days:
+
+| Role | Default | OpenCode Go alternative |
+| --- | --- | --- |
+| Architecture and difficult problems | `architect` (GPT-6 Astra) | `architect-go` (Qwen3.8 Max) |
+| Codebase exploration | `explore` (Go Luna) | `explore-go` (DeepSeek V4.1 Flash) |
+| External research | `scout` (Go Luna) | `scout-go` (DeepSeek V4.1 Flash) |
+| Scoped implementation | `general` (GPT-5.6 Terra, low) | `general-go` (MiniMax M3) |
+| Interface work | `designer` (Go Luna) | `designer-go` (Kimi K2.7 Code) |
+
+Both tracks are enabled by default. Project instructions can express a
+preference, while project `opencode.json` files can prevent automatic
+delegation to one track:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "task": {
+      "*-go": "deny"
+    }
+  }
+}
+```
+
+To disable an agent entirely, enumerate it under `agent`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "architect-go": {
+      "disable": true
+    }
+  }
+}
+```
+
+To prevent any use of Go for a project, also add `opencode-go` to
+`disabled_providers`; task permissions only govern delegation.
+
 ## Common workflows
 
 Enter the dev shell:
