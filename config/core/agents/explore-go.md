@@ -1,7 +1,7 @@
 ---
 description: Quickly investigate a codebase and report relevant files, patterns, and implementation details using OpenCode Go.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+model: opencode-go/glm-5.3-flash
 permission:
   edit: deny
   bash: allow

@@ -1,7 +1,7 @@
 ---
 description: Research external documentation, dependencies, and upstream implementations using OpenCode Go when current authoritative information is needed.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+model: opencode-go/glm-5.3-flash
 permission:
   edit: deny
   bash: allow
