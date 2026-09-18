@@ -31,7 +31,7 @@ retains abuse-monitoring logs for up to 30 days:
 
 | Role | Default | OpenCode Go alternative |
 | --- | --- | --- |
-| Architecture and difficult problems | `architect` (GPT-6 Astra) | `architect-go` (Qwen3.8 Max) |
+| Architecture and difficult problems | `architect` (GPT-6 Astra) | `architect-go` (GLM-5.3) |
 | Codebase exploration | `explore` (Go Luna) | `explore-go` (GLM-5.3 Flash) |
 | External research | `scout` (Go Luna) | `scout-go` (GLM-5.3 Flash) |
 | Scoped implementation | `general` (GPT-5.6 Terra, low) | `general-go` (MiniMax M3) |

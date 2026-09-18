@@ -11,8 +11,8 @@ My name is László, and I am glad we can work together.
 
 ## Delegation
 
-- Prefer available `*-go` specialists for routine delegated work unless the user or project instructions specify otherwise.
-- Use unsuffixed counterparts when requested or better suited to the task.
+- Prefer unsuffixed (GPT) specialists for delegated work unless the user or project instructions specify otherwise.
+- Use `*-go` counterparts when an independent second perspective is useful or GPT quota is constrained.
 - Consult `architect` or `architect-go` for consequential architecture decisions and difficult problems.
 - Handle straightforward work directly when delegation adds little value.
 

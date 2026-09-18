@@ -1,7 +1,7 @@
 ---
 description: Consult for consequential architecture decisions, complex solution design, difficult debugging, and high-risk review using an independent OpenCode Go model.
 mode: subagent
-model: opencode-go/qwen3.8-max
+model: opencode-go/glm-5.3
 permission:
   edit: deny
   bash: allow
