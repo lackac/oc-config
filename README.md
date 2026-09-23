@@ -4,11 +4,9 @@ Opinionated OpenCode wrapper and configuration.
 
 This repository packages one managed OpenCode configuration with Nix:
 
-- `opencode` / `oc`: the core profile from `config/core`
+- `opencode` / `oc`: the OpenCode v2 core profile from `config/core`
 
-The flake wraps the `opencode` binary from [`llm-agents.nix`](https://github.com/numtide/llm-agents.nix), injects repository-managed config, disables on-demand LSP downloads, and puts a baseline set of language servers on `PATH`.
-
-The wrapper also provides [`tuicr`](https://github.com/agavra/tuicr) for interactive diff review.
+The flake wraps OpenCode v2 from [`llm-agents.nix`](https://github.com/numtide/llm-agents.nix), injects repository-managed server and CLI configuration, and adds Git to its `PATH`.
 
 ## What is in here
 
@@ -44,29 +42,45 @@ delegation to one track:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "permission": {
-    "task": {
-      "*-go": "deny"
-    }
-  }
+  "permissions": [
+    { "action": "subagent", "resource": "*-go", "effect": "deny" }
+  ]
 }
 ```
 
-To disable an agent entirely, enumerate it under `agent`:
+To disable an agent entirely, enumerate it under `agents`:
 
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "agent": {
+  "agents": {
     "architect-go": {
-      "disable": true
+      "disabled": true
     }
   }
 }
 ```
 
-To prevent any use of Go for a project, also add `opencode-go` to
-`disabled_providers`; task permissions only govern delegation.
+To prevent any use of OpenCode Go for a project, add an experimental provider
+policy; subagent permissions only govern delegation.
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "experimental": {
+    "policies": [
+      { "action": "provider.use", "resource": "opencode-go", "effect": "deny" }
+    ]
+  }
+}
+```
+
+## Compaction
+
+The core profile enables OpenCode v2's checkpoint-based automatic compaction.
+It retains 15,000 recent tokens beside a structured checkpoint and reserves a
+20,000-token safety buffer. Earlier session messages remain stored, while the
+checkpoint replaces them in active model context.
 
 ## Common workflows
 
@@ -92,20 +106,10 @@ just upp llm-agents          # update the agent package set
 just syncupp llm-agents      # sync nixpkgs, then update the agent package set
 ```
 
-OpenCode and tuicr package updates come from the `llm-agents` input. This repository keeps only the wrapper and project-specific configuration.
+OpenCode package updates come from the `llm-agents` input. This repository keeps only the wrapper and project-specific configuration.
 
 ## Profiles
 
-The core profile is defined in `config/core/`. Treat that directory as the source of truth for OpenCode settings, agent guidance, TUI preferences, and user-installed skills.
+The core profile is defined in `config/core/`. Treat that directory as the source of truth for OpenCode settings, agent guidance, CLI preferences, and user-installed skills.
 
 The flake defines configurations as data and builds their wrappers through a shared constructor. Additional profiles can be introduced as sibling configuration directories and entries in the `configurations` attribute set.
-
-## tuicr
-
-The managed profile includes the `tuicr` executable and its agent skill. Start a review of uncommitted changes in another terminal, then ask the agent to read your comments from the active session:
-
-```bash
-tuicr -w
-```
-
-The agent can discover the persisted review session and exchange inline comments through `tuicr review`.

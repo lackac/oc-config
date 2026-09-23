@@ -56,31 +56,26 @@
         let
           pkgs = pkgsFor system;
           llmAgentPackages = llm-agents.packages.${system};
-          opencodePackage = llmAgentPackages.opencode;
-          tuicr = llmAgentPackages.tuicr;
+          opencodePackage = llmAgentPackages.opencode2;
 
           baselineTools = [
-            pkgs.ast-grep
-            pkgs.biome
-            pkgs.nixd
-            pkgs.marksman
-            pkgs.vscode-langservers-extracted
-            pkgs.bash-language-server
-            pkgs.yaml-language-server
             pkgs.git
-            tuicr
           ];
 
           baselineToolPath = pkgs.lib.makeBinPath baselineTools;
 
           mkWrappedOpencodeBinary = configDir: binName: ''
-            makeWrapper ${opencodePackage}/bin/opencode "$out/bin/${binName}" \
+            makeWrapper ${opencodePackage}/bin/opencode2 "$out/bin/${binName}" \
               --run 'mkdir -p /tmp/opencode' \
-              --set OPENCODE_CONFIG_DIR ${configDir} \
+              --run 'config_root="''${XDG_CONFIG_HOME:-$HOME/.config}/opencode"' \
+              --run 'mkdir -p "$config_root/agents" "$config_root/skills"' \
+              --run 'for source in ${configDir}/agents/*.md ${configDir}/skills/*; do target="$config_root/$(basename "$(dirname "$source")")/$(basename "$source")"; if [ ! -e "$target" ] || [ -L "$target" ]; then ln -sfn "$source" "$target"; fi; done' \
+              --run 'export OPENCODE_CLI_CONFIG_CONTENT="$(< ${configDir}/cli.json)"' \
+              --set OPENCODE_CONFIG ${configDir}/opencode.jsonc \
+              --unset OPENCODE_CONFIG_DIR \
               --set TMPDIR /tmp/opencode \
               --set BUN_TMPDIR /tmp/opencode \
               --set OPENCODE_DISABLE_AUTOUPDATE true \
-              --set OPENCODE_DISABLE_LSP_DOWNLOAD true \
               --suffix PATH : ${baselineToolPath}
           '';
 
@@ -97,9 +92,6 @@
               configDir = pkgs.runCommand "opencode-config-${name}" { } ''
                 mkdir -p "$out"
                 cp -R ${source}/. "$out/"
-                mkdir -p "$out/skills"
-                chmod u+w "$out/skills"
-                ln -s ${tuicr.src}/skills/tuicr "$out/skills/tuicr"
               '';
             in
             pkgs.stdenvNoCC.mkDerivation {
@@ -110,7 +102,6 @@
 
               installPhase = ''
                 mkdir -p "$out/bin"
-                ln -s ${tuicr}/bin/tuicr "$out/bin/tuicr"
 
                 ${pkgs.lib.concatMapStringsSep "\n" (mkWrappedOpencodeBinary configDir) binaries}
               '';
@@ -127,7 +118,6 @@
         configurationPackages
         // {
           default = configurationPackages.opencode;
-          inherit tuicr;
         }
       );
 
@@ -140,7 +130,6 @@
           default = pkgs.mkShell {
             packages = [
               self.packages.${system}.opencode
-              self.packages.${system}.tuicr
             ];
           };
         }
