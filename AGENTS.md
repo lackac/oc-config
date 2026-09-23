@@ -8,6 +8,12 @@ My name is László, and I am glad we can work together.
 - Verify behavior with project-appropriate checks before claiming success.
 - Match existing code style and conventions.
 - Explain trade-offs briefly when there are multiple viable options.
+- For coding tasks, understand the affected code first, then choose the first
+  sufficient approach: skip speculative work, reuse existing code, use the
+  standard library, use native platform features, use installed dependencies,
+  or write the smallest correct change. Never trade away requested behavior,
+  validation, error handling, security, or accessibility for brevity.
+- Load the `ponytail` skill when choosing or reviewing an implementation approach, unless the user opts out.
 
 ## Delegation
 
