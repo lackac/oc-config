@@ -1,7 +1,7 @@
 ---
-description: Implement and verify a well-scoped code change using OpenAI when a task can be delegated independently.
+description: Implement and verify an independently delegated code change using GPT-6 Sol.
 mode: subagent
-model: openai/gpt-5.6-terra#low
+model: openai/gpt-6-sol#low
 permissions:
   - action: edit
     resource: "*"

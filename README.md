@@ -18,21 +18,22 @@ The flake wraps OpenCode v2 from [`llm-agents.nix`](https://github.com/numtide/l
 
 The core profile uses OpenAI subscription models for its primary agents:
 
-- Plan: GPT-5.6 Sol with medium reasoning
-- Build: GPT-5.6 Terra with medium reasoning
+- Build (the default agent): GPT-6 Sol with medium reasoning
+- Plan: GPT-6 Astra with medium reasoning
 
-It provides paired specialist subagents. Unsuffixed `architect` and `general`
-use OpenAI subscription models; `explore`, `scout`, and `designer` use
-GPT-5.6 Luna from OpenCode Go to spare Plus quota. `*-go` agents use
-zero-day-retention models from OpenCode Go, except Go-provided Luna which
-retains abuse-monitoring logs for up to 30 days:
+It provides specialist subagents. `architect`, `general`, and `routine` use
+OpenAI subscription models; `explore`, `scout`, and `designer` use GPT-5.6
+Luna from OpenCode Go to spare Plus quota. `*-go` agents use zero-day-retention
+models from OpenCode Go, except Go-provided Luna which retains abuse-monitoring
+logs for up to 30 days:
 
 | Role | Default | OpenCode Go alternative |
 | --- | --- | --- |
 | Architecture and difficult problems | `architect` (GPT-6 Astra) | `architect-go` (GLM-5.3) |
 | Codebase exploration | `explore` (Go Luna) | `explore-go` (GLM-5.3 Flash) |
 | External research | `scout` (Go Luna) | `scout-go` (GLM-5.3 Flash) |
-| Scoped implementation | `general` (GPT-5.6 Terra, low) | `general-go` (MiniMax M3) |
+| Broad implementation | `general` (GPT-6 Sol, low) | `general-go` (MiniMax M3) |
+| Routine implementation | `routine` (GPT-6 Luna, medium) | — |
 | Interface work | `designer` (Go Luna) | `designer-go` (Kimi K2.7 Code) |
 
 Both tracks are enabled by default. Project instructions can express a
