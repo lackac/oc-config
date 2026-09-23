@@ -8,5 +8,14 @@
   },
   "prompt": {
     "paste": "full"
-  }
+  },
+  "diffs": {
+    "wrap": "word"
+  },
+  "session": {
+    "sidebar": "auto",
+    "scrollbar": false,
+    "thinking": "show"
+  },
+  "animations": true
 }

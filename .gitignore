@@ -1,2 +1,5 @@
-result
-result-*
+service.json
+node_modules/
+package.json
+package-lock.json
+bun.lock

@@ -1,18 +1,20 @@
 # oc-config
 
-Opinionated OpenCode wrapper and configuration.
+Personal OpenCode v2 configuration, used directly from this checkout.
 
-This repository packages one managed OpenCode configuration with Nix:
+Home Manager in [`nix-config`](https://github.com/lackac/nix-config) installs OpenCode
+from `llm-agents.nix` and links this checkout to `~/.config/opencode`. OpenCode
+reads these files directly, so edits to the configuration do not require a Nix
+rebuild:
 
-- `opencode` / `oc`: the OpenCode v2 core profile from `config/core`
+- `opencode.jsonc`: server configuration, models, permissions, and compaction
+- `cli.json`: terminal settings; changes made in OpenCode's settings UI are tracked here
+- `AGENTS.md`: global agent guidance
+- `agents/` and `skills/`: global agent and skill definitions
 
-The flake wraps OpenCode v2 from [`llm-agents.nix`](https://github.com/numtide/llm-agents.nix), injects repository-managed server and CLI configuration, and adds Git to its `PATH`.
-
-## What is in here
-
-- `flake.nix`: builds the wrapped binaries, dev shell, formatter, and checks
-- `config/core/`: base OpenCode config, agent guidance, and user-installed skills
-- `justfile`: common maintenance commands
+OpenCode writes `service.json` into this directory; it is ignored by Git. The
+background service may need a restart after upgrading the OpenCode binary, but
+ordinary configuration changes are loaded from the stable global path.
 
 ## Agent models
 
@@ -83,34 +85,11 @@ It retains 15,000 recent tokens beside a structured checkpoint and reserves a
 20,000-token safety buffer. Earlier session messages remain stored, while the
 checkpoint replaces them in active model context.
 
-## Common workflows
+## Installation
 
-Enter the dev shell:
-
-```bash
-nix develop
-```
-
-List the available `just` commands:
-
-```bash
-just
-```
-
-Useful commands:
-
-```bash
-just fmt                     # run nix fmt
-just check                   # run nix flake check
-just up                      # update all flake inputs
-just upp llm-agents          # update the agent package set
-just syncupp llm-agents      # sync nixpkgs, then update the agent package set
-```
-
-OpenCode package updates come from the `llm-agents` input. This repository keeps only the wrapper and project-specific configuration.
-
-## Profiles
-
-The core profile is defined in `config/core/`. Treat that directory as the source of truth for OpenCode settings, agent guidance, CLI preferences, and user-installed skills.
-
-The flake defines configurations as data and builds their wrappers through a shared constructor. Additional profiles can be introduced as sibling configuration directories and entries in the `configurations` attribute set.
+Clone this repo to `~/Code/lackac/oc-config` and activate Home Manager through
+`nix-config`. On the first activation, Home Manager backs up an existing
+`~/.config/opencode` directory and carries its `service.json` into the checkout.
+Review the backup for any other local files you want to retain. Restart the
+background service after activation so it drops the previous Nix-store config
+path (`opencode service restart`); newly created sessions then use this config.
