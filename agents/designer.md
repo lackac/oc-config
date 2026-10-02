@@ -1,13 +1,13 @@
 ---
-description: Implement and refine frontend interfaces with attention to usability, accessibility, and visual quality using GPT-5.6 Luna from OpenCode Go.
+description: Implement and refine frontend interfaces with attention to usability, accessibility, and visual quality using GPT-6 Luna from OpenCode Go.
 mode: subagent
-model: opencode-go/gpt-5.6-luna
+model: opencode-go/gpt-6-luna
 permissions:
   - action: edit
-    resource: "*"
+    resource: '*'
     effect: allow
   - action: shell
-    resource: "*"
+    resource: '*'
     effect: allow
 ---
 

@@ -1,13 +1,13 @@
 ---
 description: Implement and verify a well-specified, low-scope code change using GPT-6 Luna.
 mode: subagent
-model: openai/gpt-6-luna#medium
+model: opencode-go/gpt-6-luna
 permissions:
   - action: edit
-    resource: "*"
+    resource: '*'
     effect: allow
   - action: shell
-    resource: "*"
+    resource: '*'
     effect: allow
 ---
 

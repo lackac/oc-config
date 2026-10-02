@@ -1,13 +1,13 @@
 ---
-description: Implement and verify an independently delegated code change using GPT-6 Sol.
+description: Implement and verify an independently delegated code change using GPT-6.1 Sol.
 mode: subagent
-model: openai/gpt-6-sol#low
+model: openai/gpt-6.1-sol#low
 permissions:
   - action: edit
-    resource: "*"
+    resource: '*'
     effect: allow
   - action: shell
-    resource: "*"
+    resource: '*'
     effect: allow
 ---
 

@@ -1,13 +1,13 @@
 ---
-description: Quickly investigate a codebase and report relevant files, patterns, and implementation details using GPT-5.6 Luna from OpenCode Go.
+description: Quickly investigate a codebase and report relevant files, patterns, and implementation details using GPT-6 Luna from OpenCode Go.
 mode: subagent
-model: opencode-go/gpt-5.6-luna
+model: opencode-go/gpt-6-luna
 permissions:
   - action: edit
-    resource: "*"
+    resource: '*'
     effect: deny
   - action: shell
-    resource: "*"
+    resource: '*'
     effect: allow
 ---
 
