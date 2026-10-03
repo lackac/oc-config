@@ -87,6 +87,24 @@ checkpoint replaces them in active model context.
 
 ## Installation
 
+### Quota sidebar
+
+`plugins/quota/` provides compact OpenAI and OpenCode Go quota meters using
+existing ChatGPT OAuth and Go API-key connections, with no additional packages.
+
+- Meters show remaining quota: `5` (five-hour), `W` (weekly), `M` (monthly).
+  Unavailable windows are omitted; fills turn amber at ≤50% and red at ≤20%.
+- Click **Quota left** or select **Toggle quota details** in the command palette
+  for reset times. Low-quota details appear automatically.
+- Readings refresh after completions and every 15 minutes while visible, using
+  a shared server cache. Failed refreshes mark retained readings as stale.
+
+OpenAI's usage endpoint is undocumented; provider changes may require repairs.
+
+Tests: `node --test plugins/quota/quota.test.ts`.
+
+### Home Manager
+
 Clone this repo to `~/Code/lackac/oc-config` and activate Home Manager through
 `nix-config`. On the first activation, Home Manager backs up an existing
 `~/.config/opencode` directory and carries its `service.json` into the checkout.
