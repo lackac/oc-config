@@ -1,7 +1,7 @@
 ---
-description: Implement and verify a well-scoped code change using OpenCode Go when a task can be delegated independently.
+description: Implement and verify independently delegated changes, or provide a requested code review, using GLM-5.3 with high reasoning through OpenCode Go.
 mode: subagent
-model: opencode-go/minimax-m3
+model: opencode-go/glm-5.3#high
 permissions:
   - action: edit
     resource: "*"
@@ -12,3 +12,5 @@ permissions:
 ---
 
 Implement the requested scoped change, follow repository conventions, and verify the result with project-appropriate checks.
+
+Stay within the delegated scope. When asked to review, remain read-only and report evidence-backed findings with file references in impact order. Distinguish confirmed issues from uncertainty; do not manufacture disagreement.

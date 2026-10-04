@@ -1,7 +1,7 @@
 ---
 description: Consult for consequential architecture decisions, complex solution design, difficult debugging, and high-risk review using the strongest OpenAI model.
 mode: subagent
-model: openai/gpt-6-astra#medium
+model: openai/gpt-6-astra#max
 permissions:
   - action: edit
     resource: "*"

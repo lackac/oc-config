@@ -20,33 +20,46 @@ ordinary configuration changes are loaded from the stable global path.
 
 The core profile uses OpenAI subscription models for its primary agents:
 
-- Build (the default agent): GPT-6 Sol with medium reasoning
+- Build (the default agent): GPT-6 Astra with medium reasoning
 - Plan: GPT-6 Astra with medium reasoning
 
-It provides specialist subagents. `architect`, `general`, and `routine` use
-OpenAI subscription models; `explore`, `scout`, and `designer` use GPT-5.6
-Luna from OpenCode Go to spare Plus quota. `*-go` agents use zero-day-retention
-models from OpenCode Go, except Go-provided Luna which retains abuse-monitoring
-logs for up to 30 days:
+It provides specialist subagents. `architect` and `general` use OpenAI
+subscription models; `routine`, `explore`, `scout`, and `designer` use GPT-6
+Luna from OpenCode Go to spare Plus quota. `*-go` and `*-go2` agents use
+zero-day-retention models from OpenCode Go. Go-provided Luna retains
+abuse-monitoring logs for up to 30 days.
 
 | Role | Default | OpenCode Go alternative |
 | --- | --- | --- |
-| Architecture and difficult problems | `architect` (GPT-6 Astra) | `architect-go` (GLM-5.3) |
+| Architecture and difficult problems | `architect` (GPT-6 Astra, max) | `architect-go` (GLM-5.3, max); `architect-go2` (Kimi K3, max) |
 | Codebase exploration | `explore` (Go Luna) | `explore-go` (GLM-5.3 Flash) |
 | External research | `scout` (Go Luna) | `scout-go` (GLM-5.3 Flash) |
-| Broad implementation | `general` (GPT-6 Sol, low) | `general-go` (MiniMax M3) |
-| Routine implementation | `routine` (GPT-6 Luna, medium) | — |
+| Broad implementation | `general` (GPT-6.1 Sol, high) | `general-go` (GLM-5.3, high); `general-go2` (Kimi K3, max) |
+| Routine implementation | `routine` (Go Luna) | — |
 | Interface work | `designer` (Go Luna) | `designer-go` (Kimi K2.7 Code) |
 
-Both tracks are enabled by default. Project instructions can express a
-preference, while project `opencode.json` files can prevent automatic
-delegation to one track:
+Unsuffixed agents remain preferred. The Go counterparts provide independent
+perspectives on request or when useful, and alternatives when GPT quota is
+constrained. GLM is the first Go choice for implementation and investigative
+debugging; Kimi provides another perspective for long-context design analysis
+and repository work. These are selection guidelines, not limits on their roles.
+
+GLM uses max reasoning for architecture and high for implementation. Kimi uses
+max for both because that is the only effort variant currently exposed by Go;
+its architect and general agents differ in role and permissions. Published
+benchmarks support these as capable counterpoints, without establishing parity
+with Astra or Sol at maximum effort. See [Artificial Analysis](https://artificialanalysis.ai/models/releases/comparisons/glm-5-3-vs-kimi-k3)
+and the [GLM model card](https://huggingface.co/zai-org/GLM-5.3).
+
+All variants are enabled by default. Project instructions can express a
+preference, while project `opencode.json` files can block delegation to Go
+counterparts:
 
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
   "permissions": [
-    { "action": "subagent", "resource": "*-go", "effect": "deny" }
+    { "action": "subagent", "resource": "*-go*", "effect": "deny" }
   ]
 }
 ```

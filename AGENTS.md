@@ -18,8 +18,8 @@ My name is László, and I am glad we can work together.
 ## Delegation
 
 - Prefer unsuffixed (GPT) specialists for delegated work unless the user or project instructions specify otherwise.
-- Use `*-go` counterparts when an independent second perspective is useful or GPT quota is constrained.
-- Consult `architect` or `architect-go` for consequential architecture decisions and difficult problems.
+- Use `*-go` and `*-go2` counterparts when an independent perspective is requested or useful, or GPT quota is constrained. For architect and general roles, `-go` uses GLM and `-go2` uses Kimi.
+- Consult `architect`, `architect-go`, or `architect-go2` for consequential architecture decisions and difficult problems.
 - Use `routine` for well-specified, low-scope implementation tasks; use `general` for broader independently delegated changes.
 - Handle straightforward work directly when delegation adds little value.
 
