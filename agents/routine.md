@@ -1,7 +1,7 @@
 ---
-description: Implement and verify a well-specified, low-scope code change using GPT-6 Luna.
+description: Implement and verify a well-specified, low-scope code change using GPT-6.1 Sol with low reasoning.
 mode: subagent
-model: opencode-go/gpt-6-luna
+model: openai/gpt-6.1-sol#low
 permissions:
   - action: edit
     resource: '*'

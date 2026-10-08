@@ -13,7 +13,7 @@
       "model": "openai/gpt-6-astra#medium"
     },
     "title": {
-      "model": "opencode/gpt-6-luna"
+      "model": "openai/gpt-6-luna#none"
     }
   },
   "permissions": [
