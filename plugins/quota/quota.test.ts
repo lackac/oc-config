@@ -1,6 +1,6 @@
 import { test } from "node:test"
 import assert from "node:assert/strict"
-import { openaiWindows, goWindows, bar, quotaBar } from "./meters.ts"
+import { openaiWindows, BAR_WIDTH, bar, quotaBar } from "./meters.ts"
 import { meterCache, QuotaFailure, COOLDOWN_MS } from "./cache.ts"
 
 test("OpenAI windows use duration, omit missing windows, and preserve zero", () => {
@@ -14,24 +14,20 @@ test("OpenAI windows use duration, omit missing windows, and preserve zero", () 
   } } }))
 })
 
-test("Go respects rate-limited status and rejects malformed readings", () => {
-  const window = { status: "rate-limited", percent: 40, resetsAt: "2026-10-08T00:00:00Z" }
-  assert.equal(goWindows({ usage: { monthly: window } })[0].remaining, 0)
-  assert.throws(() => goWindows({ usage: { monthly: { ...window, percent: "40" } } }))
-  assert.throws(() => goWindows({ usage: {} }))
-  assert.equal(bar(0), "▕   ▏")
-  assert.equal(bar(30), "▕▉  ▏")
-  assert.equal(bar(50), "▕█▌ ▏")
-  assert.equal(bar(100), "▕███▏")
+test("longer bars preserve fractional fills and fixed width", () => {
+  assert.equal(bar(0), "▕            ▏")
+  assert.equal(bar(30), "▕███▋        ▏")
+  assert.equal(bar(50), "▕██████      ▏")
+  assert.equal(bar(100), "▕████████████▏")
 })
 
 test("full quota replaces the closing boundary without changing meter width", () => {
-  assert.equal(quotaBar(100), "▕███100%")
-  assert.equal(quotaBar(99.9), "▕███▏99%")
-  assert.equal(quotaBar(30), "▕▉  ▏30%")
-  assert.equal(quotaBar(9), "▕▎  ▏ 9%")
-  assert.equal(quotaBar(0), "▕   ▏ 0%")
-  for (let percent = 0; percent <= 100; percent++) assert.equal(quotaBar(percent).length, 8)
+  assert.equal(quotaBar(100), "▕████████████100%")
+  assert.equal(quotaBar(99.9), "▕████████████▏99%")
+  assert.equal(quotaBar(30), "▕███▋        ▏30%")
+  assert.equal(quotaBar(9), "▕█▏          ▏ 9%")
+  assert.equal(quotaBar(0), "▕            ▏ 0%")
+  for (let percent = 0; percent <= 100; percent++) assert.equal(quotaBar(percent).length, BAR_WIDTH + 5)
 })
 
 test("cache coalesces reads, throttles refresh, and marks previous data stale", async () => {

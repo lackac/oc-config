@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto"
 import { meterCache, QuotaFailure } from "./cache.ts"
-import { openaiWindows, goWindows } from "./meters.ts"
+import { openaiWindows } from "./meters.ts"
 import { quotaDefinition } from "./rpc.ts"
 
 async function usage(url: string, headers: Record<string, string>, signal: AbortSignal) {
@@ -23,34 +23,27 @@ export default {
   id: "local.quota",
   async setup(context) {
     const abort = new AbortController()
-    const caches = { openai: meterCache("OpenAI"), "opencode-go": meterCache("Go") }
-    const read = async (id: keyof typeof caches, refresh: boolean) => {
+    const cache = meterCache("OpenAI")
+    const read = async (refresh: boolean) => {
       try {
-        const connection = await context.integration.connection.active(id)
+        const connection = await context.integration.connection.active("openai")
         const credential = connection ? await context.integration.connection.resolve(connection) : undefined
-        const valid = id === "openai" ? credential?.type === "oauth" : credential?.type === "key"
-        const token = valid ? (credential.type === "oauth" ? credential.access : credential.key) : ""
+        const token = credential?.type === "oauth" ? credential.access : ""
         const account = credential?.metadata?.accountID ?? credential?.metadata?.accountId
         const identity = createHash("sha256").update(JSON.stringify([connection, token, account])).digest("hex")
-        return caches[id].read(identity, refresh, async () => {
-          if (!valid || !token) throw new QuotaFailure(id === "openai" ? "Connect ChatGPT" : "Connect Go API key")
+        return cache.read(identity, refresh, async () => {
+          if (!token) throw new QuotaFailure("Connect ChatGPT")
           const headers: Record<string, string> = { Authorization: `Bearer ${token}` }
-          if (id === "openai") {
-            if (typeof account === "string") headers["ChatGPT-Account-Id"] = account
-            return openaiWindows(await usage("https://chatgpt.com/backend-api/wham/usage", headers, abort.signal))
-          }
-          return goWindows(await usage("https://opencode.ai/zen/go/v1/usage", headers, abort.signal))
+          if (typeof account === "string") headers["ChatGPT-Account-Id"] = account
+          return openaiWindows(await usage("https://chatgpt.com/backend-api/wham/usage", headers, abort.signal))
         })
       } catch {
         // Do not retain another account's readings when credential resolution fails.
-        return caches[id].read("unresolved", refresh, async () => { throw new QuotaFailure("Sign-in unavailable") })
+        return cache.read("unresolved", refresh, async () => { throw new QuotaFailure("Sign-in unavailable") })
       }
     }
     const registration = await context.rpc.register(quotaDefinition, {
-      read: async (input) => ({ meters: await Promise.all([
-        read("openai", input?.refresh === true),
-        read("opencode-go", input?.refresh === true),
-      ]) }),
+      read: async (input) => ({ meters: [await read(input?.refresh === true)] }),
     })
     return () => { abort.abort(); return registration.dispose() }
   },

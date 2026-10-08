@@ -66,8 +66,8 @@ It uses project-local rendering tools; FFmpeg can run through a pinned Nix shell
 
 ### Quota sidebar
 
-`plugins/quota/` provides compact OpenAI and OpenCode Go quota meters using
-existing ChatGPT OAuth and Go API-key connections, with no additional packages.
+`plugins/quota/` shows OpenAI quota using the existing ChatGPT OAuth connection,
+with no additional packages.
 
 - Meters show remaining quota: `5` (five-hour), `W` (weekly), `M` (monthly).
   Unavailable windows are omitted; fills turn amber at ≤50% and red at ≤20%.

@@ -1,6 +1,6 @@
 import { For, Show, createSignal, onCleanup } from "solid-js"
 import { quotaDefinition } from "./rpc.ts"
-import { quotaBar, resetLabel, type Meter } from "./meters.ts"
+import { BAR_WIDTH, quotaBar, resetLabel, type Meter } from "./meters.ts"
 import { COOLDOWN_MS, POLL_MS } from "./cache.ts"
 
 // Solarized colors match this configuration's terminal theme.
@@ -75,7 +75,7 @@ export default {
                   <text fg={colors.muted}>{meter.provider.padEnd(6)}</text>
                   <For each={meter.windows}>{(window) => (
                     <text fg={colors.muted}>
-                      {window.label === "5h" ? "5" : window.label}▕<span style={{ fg: quotaColor(window.remaining) }}>{quotaBar(window.remaining).slice(1, 4)}</span>{quotaBar(window.remaining).slice(4)}
+                      {window.label === "5h" ? "5" : window.label}▕<span style={{ fg: quotaColor(window.remaining) }}>{quotaBar(window.remaining).slice(1, BAR_WIDTH + 1)}</span>{quotaBar(window.remaining).slice(BAR_WIDTH + 1)}
                     </text>
                   )}</For>
                   <Show when={!expanded() && meter.windows.length === 1}>

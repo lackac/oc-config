@@ -34,31 +34,17 @@ export function openaiWindows(payload: unknown, now = Date.now()): Window[] {
   return windows.sort((a, b) => ["5h", "W", "M"].indexOf(a.label) - ["5h", "W", "M"].indexOf(b.label))
 }
 
-export function goWindows(payload: unknown): Window[] {
-  const usage = record(record(payload).usage)
-  const windows: Window[] = []
-  for (const [key, label] of [["rolling", "5h"], ["weekly", "W"], ["monthly", "M"]]) {
-    if (usage[key] == null) continue
-    const window = record(usage[key])
-    if (window.status !== "ok" && window.status !== "rate-limited") throw new Error("Invalid quota status")
-    const used = percent(window.percent)
-    const reset = typeof window.resetsAt === "string" ? Date.parse(window.resetsAt) : NaN
-    if (!Number.isFinite(reset)) throw new Error("Invalid quota reset")
-    windows.push({ label, remaining: window.status === "rate-limited" ? 0 : 100 - used, reset })
-  }
-  if (!windows.length) throw new Error("Missing quota data")
-  return windows
-}
+export const BAR_WIDTH = 12
 
 export function bar(remaining: number): string {
-  const eighths = Math.round(Math.max(0, Math.min(100, remaining)) * 24 / 100)
+  const eighths = Math.round(Math.max(0, Math.min(100, remaining)) * BAR_WIDTH * 8 / 100)
   const full = Math.floor(eighths / 8)
   const partial = eighths % 8
-  return "▕" + "█".repeat(full) + (partial ? "▏▎▍▌▋▊▉"[partial - 1] : "") + " ".repeat(3 - full - (partial ? 1 : 0)) + "▏"
+  return "▕" + "█".repeat(full) + (partial ? "▏▎▍▌▋▊▉"[partial - 1] : "") + " ".repeat(BAR_WIDTH - full - (partial ? 1 : 0)) + "▏"
 }
 
 export function quotaBar(remaining: number): string {
-  if (remaining === 100) return "▕███100%"
+  if (remaining === 100) return "▕" + "█".repeat(BAR_WIDTH) + "100%"
   return bar(remaining) + `${Math.min(99, Math.round(remaining))}%`.padStart(3)
 }
 
