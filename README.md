@@ -98,6 +98,27 @@ It retains 15,000 recent tokens beside a structured checkpoint and reserves a
 20,000-token safety buffer. Earlier session messages remain stored, while the
 checkpoint replaces them in active model context.
 
+## Explainer videos
+
+The [`explainer-videos`](skills/explainer-videos/SKILL.md) skill creates narrated
+videos with the local `kokoro-narrate` tool from CLI toolbox. Emma is the default
+voice. Requests can select a voice or blend, speed, pronunciation, pauses, visual
+style, palette, typography, aspect ratio, duration, and captions.
+
+Styles include whiteboard, collage, technical diagrams, editorial layouts,
+kinetic typography, interface walkthroughs, and custom directions. For example:
+
+> Use explainer-videos to explain cache invalidation for junior developers in
+> about 60 seconds. Use technical diagrams with a warm light palette, Emma at
+> 1.05× speed, and sidecar captions.
+
+> Make a portrait collage explainer about heat pumps. Blend Emma, Isabella, and
+> Lewis equally, with calm motion and burned-in captions.
+
+The skill keeps a per-video brief and editable sources, measures narration to
+drive animation and caption timing, and requires review of the rendered output.
+It uses project-local rendering tools; FFmpeg can run through a pinned Nix shell.
+
 ## Installation
 
 ### Quota sidebar

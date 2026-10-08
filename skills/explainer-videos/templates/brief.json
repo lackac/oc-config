@@ -1,0 +1,24 @@
+{
+  "topic": "",
+  "audience": "curious non-specialists",
+  "target_seconds": 60,
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "captions": "srt"
+  },
+  "visual": {
+    "style": "technical-diagram",
+    "palette": null,
+    "font": null,
+    "motion": "calm",
+    "references": []
+  },
+  "narration": {
+    "voice": "bf_emma",
+    "speed": 1.0,
+    "lang_code": null,
+    "gap_seconds": 0.25
+  }
+}
