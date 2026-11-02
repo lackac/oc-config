@@ -3,6 +3,10 @@
   "update": "disable",
   "model": "openai/gpt-6.1-sol",
   "default_agent": "build",
+  "skills": [
+    "~/.config/opencode/vendor/matt-pocock-skills/skills/engineering",
+    "~/.config/opencode/vendor/matt-pocock-skills/skills/productivity"
+  ],
   "agents": {
     "plan": {
       "mode": "primary",

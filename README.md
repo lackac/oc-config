@@ -41,6 +41,30 @@ It retains 15,000 recent tokens beside a structured checkpoint and reserves a
 20,000-token safety buffer. Earlier session messages remain stored, while the
 checkpoint replaces them in active model context.
 
+## Matt Pocock's skills
+
+[`vendor/matt-pocock-skills`](https://github.com/mattpocock/skills) is an unmodified
+Git submodule pinned to a reviewed upstream revision. Global configuration loads
+only its promoted `skills/engineering/` and `skills/productivity/` directories,
+including their supporting files. Experimental and miscellaneous skills are not
+registered.
+
+Pocock's invocation defaults are preserved in every project, including Life:
+model-invoked skills are available automatically, while user-invoked workflows
+require an explicit request. For example:
+
+- `@ask-matt` recommends a skill or workflow.
+- `@grill-me` interviews you about an idea or decision.
+- `@grill-with-docs` also builds domain terminology and decision records.
+
+For tracker-based engineering workflows, run `@setup-matt-pocock-skills` once in
+the target project. It proposes the issue tracker and documentation conventions
+before writing them. Loading these skills does not configure individual projects.
+Skill instructions do not override the requirement for explicit authorization
+before committing, pushing, or making other external writes.
+
+Keep local guidance in `AGENTS.md` rather than editing upstream skill files.
+
 ## Explainer videos
 
 The [`explainer-videos`](skills/explainer-videos/SKILL.md) skill creates narrated
