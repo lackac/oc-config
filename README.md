@@ -1,20 +1,15 @@
 # oc-config
 
-Personal OpenCode v2 configuration, used directly from this checkout.
-
-Home Manager in [`nix-config`](https://github.com/lackac/nix-config) installs OpenCode
-from `llm-agents.nix` and links this checkout to `~/.config/opencode`. OpenCode
-reads these files directly, so edits to the configuration do not require a Nix
-rebuild:
+Personal OpenCode v2 configuration, loaded from `~/.config/opencode`.
 
 - `opencode.jsonc`: server configuration, models, permissions, and compaction
 - `cli.json`: terminal settings; changes made in OpenCode's settings UI are tracked here
 - `AGENTS.md`: global agent guidance
 - `agents/` and `skills/`: global agent and skill definitions
+- `plugins/`: server and terminal integrations
 
-OpenCode writes `service.json` into this directory; it is ignored by Git. The
-background service may need a restart after upgrading the OpenCode binary, but
-ordinary configuration changes are loaded from the stable global path.
+OpenCode loads ordinary configuration changes automatically. Its runtime
+`service.json` file is ignored by Git.
 
 ## Agent models
 
@@ -84,14 +79,28 @@ kinetic typography, interface walkthroughs, and custom directions. For example:
 
 The skill keeps a per-video brief and editable sources, measures narration to
 drive animation and caption timing, and requires review of the rendered output.
-It uses project-local rendering tools; FFmpeg can run through a pinned Nix shell.
+It uses project-local rendering tools.
 
-## Installation
+## Plugins
+
+### Worktrunk
+
+`plugins/worktrunk/` connects OpenCode to [Worktrunk](https://worktrunk.dev/):
+
+- Shows branch activity in `wt list`: 🤖 while working and 💬 while waiting,
+  including sessions launched directly in OpenCode.
+- Routes native OpenCode worktree creation and removal through `wt`, honoring
+  Worktrunk's naming preferences and lifecycle hooks.
+
+Activity markers are per branch, not per session. The plugin does not create a
+worktree merely because a session starts or grant permission to commit or merge.
+
+Integration test: `node --test tests/worktrunk.test.ts`. It checks the running
+OpenCode server and requires this checkout to be the global configuration.
 
 ### Quota sidebar
 
-`plugins/quota/` shows OpenAI quota using the existing ChatGPT OAuth connection,
-with no additional packages.
+`plugins/quota/` shows OpenAI quota using the existing ChatGPT OAuth connection.
 
 - Meters show remaining quota: `5` (five-hour), `W` (weekly), `M` (monthly).
   Unavailable windows are omitted; fills turn amber at ≤50% and red at ≤20%.
@@ -103,12 +112,3 @@ with no additional packages.
 OpenAI's usage endpoint is undocumented; provider changes may require repairs.
 
 Tests: `node --test plugins/quota/quota.test.ts`.
-
-### Home Manager
-
-Clone this repo to `~/Code/lackac/oc-config` and activate Home Manager through
-`nix-config`. On the first activation, Home Manager backs up an existing
-`~/.config/opencode` directory and carries its `service.json` into the checkout.
-Review the backup for any other local files you want to retain. Restart the
-background service after activation so it drops the previous Nix-store config
-path (`opencode service restart`); newly created sessions then use this config.
