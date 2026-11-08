@@ -1,7 +1,7 @@
 ---
-description: Implement and verify a well-specified, low-scope code change using GPT-6.1 Sol with low reasoning.
+description: Implement and verify a well-specified, low-scope code change using GPT-6.1 Terra with medium reasoning.
 mode: subagent
-model: openai/gpt-6.1-sol#low
+model: openai/gpt-6.1-terra#medium
 permissions:
   - action: edit
     resource: '*'

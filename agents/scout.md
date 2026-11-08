@@ -1,7 +1,7 @@
 ---
 description: Research external documentation, dependencies, and upstream implementations using GPT-6 Luna when current authoritative information is needed.
 mode: subagent
-model: openai/gpt-6-luna
+model: openai/gpt-6-luna#medium
 permissions:
   - action: edit
     resource: '*'

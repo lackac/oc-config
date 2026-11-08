@@ -10,11 +10,11 @@
   "agents": {
     "plan": {
       "mode": "primary",
-      "model": "openai/gpt-6-astra#medium"
+      "model": "openai/gpt-6.1-sol#max"
     },
     "build": {
       "mode": "primary",
-      "model": "openai/gpt-6-astra#medium"
+      "model": "openai/gpt-6.1-sol#high"
     },
     "title": {
       "model": "openai/gpt-6-luna#none"

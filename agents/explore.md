@@ -1,7 +1,7 @@
 ---
 description: Quickly investigate a codebase and report relevant files, patterns, and implementation details using GPT-6 Luna.
 mode: subagent
-model: openai/gpt-6-luna
+model: openai/gpt-6-luna#low
 permissions:
   - action: edit
     resource: '*'
