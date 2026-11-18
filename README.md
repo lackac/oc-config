@@ -83,6 +83,12 @@ It uses project-local rendering tools.
 
 ## Plugins
 
+### Rich selection copy
+
+[`plugins/rich-copy/`](plugins/rich-copy/README.md) automatically copies selected
+output as HTML and plain text on macOS, preserving formatting, lists, and tables.
+Run `/rich-copy-info` for the last copy result.
+
 ### Worktrunk
 
 `plugins/worktrunk/` connects OpenCode to [Worktrunk](https://worktrunk.dev/):
