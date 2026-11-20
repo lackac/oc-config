@@ -15,19 +15,19 @@ OpenCode loads ordinary configuration changes automatically. Its runtime
 
 The core profile uses OpenAI subscription models for its primary agents:
 
-- Build (the default agent): GPT-6.1 Sol with high reasoning
-- Plan: GPT-6.1 Sol with max reasoning
+- Build (the default agent): GPT-6.2 Sol with high reasoning
+- Plan: GPT-6.2 Sol with max reasoning
 
 All specialist subagents use OpenAI subscription models:
 
 | Role | Agent | Model |
 | --- | --- | --- |
-| Architecture and difficult problems | `architect` | GPT-6 Astra, max |
+| Architecture and difficult problems | `architect` | GPT-6.2 Astra, max |
 | Codebase exploration | `explore` | GPT-6 Luna, low |
 | External research | `scout` | GPT-6 Luna, medium |
-| Broad implementation | `general` | GPT-6.1 Sol, high |
+| Broad implementation | `general` | GPT-6.2 Sol, high |
 | Routine implementation | `routine` | GPT-6.1 Terra, medium |
-| Interface work | `designer` | GPT-6.1 Sol, low |
+| Interface work | `designer` | GPT-6.2 Sol, low |
 
 ## Compaction
 
