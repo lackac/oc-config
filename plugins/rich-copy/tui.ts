@@ -16,7 +16,6 @@ export default {
     const copy = () => {
       const selection = renderer.getSelection()
       if (!selection || selection.isDragging) return
-      if (renderer.currentFocusedEditor && selection.selectedRenderables.includes(renderer.currentFocusedEditor)) return
       const version = ++generation
       abort?.abort()
       // OpenTUI emits before refreshing selectedRenderables. Read after that update.

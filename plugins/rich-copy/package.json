@@ -7,7 +7,7 @@
     "./tui": "./tui.ts"
   },
   "scripts": {
-    "test": "bun test selection.test.ts && node --test clipboard.test.ts"
+    "test": "bun test selection.test.ts tui.test.ts && node --test clipboard.test.ts"
   },
   "devDependencies": {
     "@opentui/core": "0.8.0"
