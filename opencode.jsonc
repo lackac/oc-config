@@ -7,6 +7,14 @@
     "~/.config/opencode/vendor/matt-pocock-skills/skills/engineering",
     "~/.config/opencode/vendor/matt-pocock-skills/skills/productivity"
   ],
+  "mcp": {
+    "servers": {
+      "browse": {
+        "type": "local",
+        "command": ["/etc/profiles/per-user/lackac/bin/browse", "mcp"]
+      }
+    }
+  },
   "agents": {
     "plan": {
       "mode": "primary",
