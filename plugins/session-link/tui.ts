@@ -1,40 +1,37 @@
-import { spawnSync } from "node:child_process"
-import { sessionLinkDefinition } from "./rpc"
-
-const SessionLink = sessionLinkDefinition
+import { isBlockID, isRequestID, isSessionID, sessionLinkDefinition } from "./rpc.ts"
 
 export default {
   id: "opencode.session-link.cli",
   setup(context) {
-    const paneID = process.env.TMUX_PANE
-    if (!paneID || !/^%[0-9]+$/.test(paneID)) return
+    const blockID = process.env.REX_BLOCK
+    if (!isBlockID(blockID)) return
 
-    const tmux = (...args: string[]) => spawnSync("tmux", args, { stdio: "ignore" })
-    tmux("set-option", "-p", "-t", paneID, "@opencode-tui", "1")
+    const rpc = context.client.rpc(sessionLinkDefinition)
+    let generation = 0
+    const openPending = async (location: { directory: string }) => {
+      const currentGeneration = ++generation
+      const { requestID, sessionID, acknowledged } = await rpc.pending({ blockID }, { location })
+      if (currentGeneration !== generation || acknowledged !== false || !isRequestID(requestID) || !isSessionID(sessionID)) return
 
-    const rpc = context.client.rpc(SessionLink)
-    const open = async (request: { paneID: string; requestID: string; sessionID: string }) => {
-      if (request.paneID !== paneID) return
       const current = context.ui.router.current()
-      if (current.type !== "session" || current.sessionID !== request.sessionID) {
-        if (context.ui.tabs.enabled()) context.ui.tabs.focus(request.sessionID)
-        else context.ui.router.navigate({ type: "session", sessionID: request.sessionID })
+      if (current.type !== "session" || current.sessionID !== sessionID) {
+        if (context.ui.tabs.enabled()) context.ui.tabs.focus(sessionID)
+        else context.ui.router.navigate({ type: "session", sessionID })
       }
-      await rpc.acknowledge({ paneID, requestID: request.requestID })
+      await rpc.acknowledge({ blockID, requestID }, { location })
     }
 
     const stop = rpc.events.on("requested", (event) => {
-      void open(event.data).catch(console.error)
+      const { blockID: target, requestID, sessionID } = event.data
+      if (target !== blockID || !isRequestID(requestID) || !isSessionID(sessionID)) return
+      // A queued event may have been superseded by a newer request.
+      return openPending(event.location).catch(console.error)
     })
-    void rpc.pending({ paneID }).then((request) => {
-      if (request.sessionID && request.requestID) {
-        return open({ paneID, sessionID: request.sessionID, requestID: request.requestID })
-      }
-    }).catch(console.error)
+    void openPending(context.location ?? context.data.location.default()).catch(console.error)
 
     return () => {
+      generation++
       stop()
-      tmux("set-option", "-p", "-u", "-t", paneID, "@opencode-tui")
     }
   },
 }

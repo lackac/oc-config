@@ -1,10 +1,28 @@
+const uuid = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+const blockID = new RegExp(`^block:${uuid}$`)
+const requestID = new RegExp(`^${uuid}$`)
+const sessionID = /^ses_[A-Za-z0-9]+$/
+
+export const isBlockID = (value: unknown): value is string => typeof value === "string" && blockID.test(value)
+export const isRequestID = (value: unknown): value is string => typeof value === "string" && requestID.test(value)
+export const isSessionID = (value: unknown): value is string => typeof value === "string" && sessionID.test(value)
+
+// OpenCode V2's RPC JSON Schema validator rejects pattern keywords.
+const ids = {
+  blockID: { type: "string" },
+  requestID: { type: "string" },
+  sessionID: { type: "string" },
+} as const
+const empty = { type: "object", properties: {}, additionalProperties: false } as const
+const errors = { invalid_id: empty }
+
 const request = {
   type: "object" as const,
   properties: {
-    sessionID: { type: "string" as const },
-    paneID: { type: "string" as const },
+    sessionID: ids.sessionID,
+    blockID: ids.blockID,
   },
-  required: ["sessionID", "paneID"],
+  required: ["sessionID", "blockID"],
   additionalProperties: false,
 }
 
@@ -13,17 +31,19 @@ export const sessionLinkDefinition = {
   methods: {
     request: {
       input: request,
+      errors,
       output: {
         type: "object",
-        properties: { requestID: { type: "string" } },
+        properties: { requestID: ids.requestID },
         required: ["requestID"],
       },
     },
     pending: {
+      errors,
       input: {
         type: "object",
-        properties: { paneID: request.properties.paneID },
-        required: ["paneID"],
+        properties: { blockID: ids.blockID },
+        required: ["blockID"],
         additionalProperties: false,
       },
       output: {
@@ -31,33 +51,31 @@ export const sessionLinkDefinition = {
         properties: {
           requestID: { type: ["string", "null"] },
           sessionID: { type: ["string", "null"] },
+          acknowledged: { type: "boolean" },
         },
-        required: ["requestID", "sessionID"],
+        required: ["requestID", "sessionID", "acknowledged"],
       },
     },
     acknowledge: {
+      errors,
       input: {
         type: "object",
         properties: {
-          paneID: request.properties.paneID,
-          requestID: { type: "string" },
+          blockID: ids.blockID,
+          requestID: ids.requestID,
         },
-        required: ["paneID", "requestID"],
+        required: ["blockID", "requestID"],
         additionalProperties: false,
       },
-      output: { type: "object", properties: {}, additionalProperties: false },
+      output: empty,
     },
   },
   events: {
     requested: {
       schema: {
         type: "object",
-        properties: {
-          paneID: request.properties.paneID,
-          requestID: { type: "string" },
-          sessionID: request.properties.sessionID,
-        },
-        required: ["paneID", "requestID", "sessionID"],
+        properties: ids,
+        required: ["blockID", "requestID", "sessionID"],
         additionalProperties: false,
       },
     },
