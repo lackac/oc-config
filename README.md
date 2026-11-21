@@ -89,6 +89,14 @@ It uses project-local rendering tools.
 output as HTML and plain text on macOS, preserving formatting, lists, and tables.
 Run `/rich-copy-info` for the last copy result.
 
+### Rex status
+
+[`opencode-rex-status`](https://github.com/martinmiglio/opencode-rex-status) flags
+completed and failed OpenCode sessions in Rex. It only runs inside Rex and
+requires OpenCode 2.2 or later.
+
+On a fresh checkout, run `git submodule update --init vendor/opencode-rex-status`.
+
 ### Worktrunk
 
 `plugins/worktrunk/` connects OpenCode to [Worktrunk](https://worktrunk.dev/):

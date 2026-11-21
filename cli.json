@@ -26,7 +26,8 @@
       "options": {
         "automatic": true
       }
-    }
+    },
+    "./vendor/opencode-rex-status"
   ],
   "animations": true
 }

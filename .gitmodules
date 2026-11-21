@@ -1,3 +1,6 @@
 [submodule "vendor/matt-pocock-skills"]
 	path = vendor/matt-pocock-skills
 	url = https://github.com/mattpocock/skills.git
+[submodule "vendor/opencode-rex-status"]
+	path = vendor/opencode-rex-status
+	url = https://github.com/martinmiglio/opencode-rex-status.git
