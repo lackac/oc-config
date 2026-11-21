@@ -89,6 +89,22 @@ It uses project-local rendering tools.
 output as HTML and plain text on macOS, preserving formatting, lists, and tables.
 Run `/rich-copy-info` for the last copy result.
 
+### Transcript links
+
+Click a file reference in a conversation to open it in Neovim. Relative paths
+use the session directory, and references such as `src/app.ts:25:3` or
+`src/app.ts#L25` jump to the specified position. Web and session links still
+use OpenCode's click handlers.
+
+Use **Ctrl+P → Open transcript link** or `/links` to search for file references
+and web links from the keyboard. In Rex or tmux, the opener reuses the
+`Prefix+v` editor in the same window when it can identify exactly one; otherwise
+it opens a floating editor. Reload the mux configuration and reopen any
+pre-existing `Prefix+v` editor to enable reuse. File paths must exist on the
+machine running the TUI.
+
+Tests: `node --test plugins/transcript-links/transcript-links.test.ts`.
+
 ### Rex status
 
 [`opencode-rex-status`](https://github.com/martinmiglio/opencode-rex-status) flags

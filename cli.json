@@ -27,7 +27,8 @@
         "automatic": true
       }
     },
-    "./vendor/opencode-rex-status"
+    "./vendor/opencode-rex-status",
+    "./plugins/transcript-links"
   ],
   "animations": true
 }
