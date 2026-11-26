@@ -2,7 +2,7 @@ import { homedir } from "node:os"
 import { resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 
-export type FileLink = { kind: "file"; file: string; line?: number; column?: number }
+export type FileLink = { kind: "file"; file: string; line?: number; column?: number; fragment?: string }
 type WebLink = { kind: "web"; url: string }
 export type Link = FileLink | WebLink
 
@@ -16,14 +16,16 @@ export function parseLink(value: string, directory: string, explicit = false): L
   }
   if (value.startsWith("#") || value.startsWith("//")) return
 
-  const anchor = /#L?(\d+)(?::(\d+)|(?:-L?\d+))?$/.exec(value)
-  const position = anchor ?? /:(\d+)(?::(\d+)|(?:-\d+))?$/.exec(value)
-  let file = position ? value.slice(0, position.index) : value
+  const hash = /#([^/]+)$/.exec(value)
+  const suffix = hash ? null : /:(\d+)(?::(\d+)|(?:-\d+))?$/.exec(value)
+  let file = value.slice(0, hash?.index ?? suffix?.index ?? value.length)
   if (!file || /^[a-z][a-z0-9+.-]*:/i.test(file) && !/^file:\/\//i.test(file)) return
-  if (!explicit && !position && !file.includes("/") && !file.includes(".") &&
+  if (!explicit && !hash && !suffix && !file.includes("/") && !file.includes(".") &&
       !/^(?:[A-Z][A-Z0-9_-]+|[A-Z][a-z]+file)$/.test(file)) return
 
+  let fragment: string | undefined
   try {
+    if (hash) fragment = decodeURIComponent(hash[1])
     if (/^file:\/\//i.test(file)) {
       const url = new URL(file)
       if (url.hash || url.search) return
@@ -34,13 +36,15 @@ export function parseLink(value: string, directory: string, explicit = false): L
   } catch {
     return
   }
-  if (!file || control.test(file) || file.startsWith("//")) return
+  if (!file || control.test(file) || file.startsWith("//") || fragment && control.test(fragment)) return
   if (file.startsWith("~/")) file = resolve(homedir(), file.slice(2))
 
+  const anchor = fragment ? /^L?(\d+)(?::(\d+)|(?:-L?\d+))?$/.exec(fragment) : null
+  const position = anchor ?? suffix
   const line = position ? Number(position[1]) : undefined
   const column = position?.[2] ? Number(position[2]) : undefined
   if ([line, column].some((n) => n !== undefined && (!Number.isInteger(n) || n < 1 || n > 0x7fffffff))) return
-  return { kind: "file", file: resolve(directory, file), line, column }
+  return { kind: "file", file: resolve(directory, file), line, column, ...(fragment && !anchor ? { fragment } : {}) }
 }
 
 const web = String.raw`(?:https?|file):\/\/[^\s<>"'\x60]+`

@@ -39,7 +39,7 @@ export async function transcriptOptions(messages: Message[], directory: string) 
 export default {
   id: "local.transcript-links.cli",
   setup(context) {
-    const openEditor = createOpener()
+    const openFile = createOpener()
     let disposed = false
     const active = () => {
       const route = context.ui.router.current()
@@ -55,7 +55,7 @@ export default {
         if (link.kind === "web") await openBrowser(link.url)
         else {
           if (!(await stat(link.file).catch(() => undefined))?.isFile()) throw new Error(`File not found: ${link.file}`)
-          await openEditor(link, cwd)
+          await openFile(link, cwd)
         }
       } catch (error) {
         notify(error instanceof Error ? error.message : String(error), "error")

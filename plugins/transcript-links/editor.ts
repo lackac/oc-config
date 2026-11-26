@@ -39,24 +39,26 @@ const rexBlock = /^block:[\da-f-]+$/i
 const isSocket = async (path: string) => (await stat(path).catch(() => undefined))?.isSocket() === true
 
 async function openTmux(
-  link: FileLink, directory: string, origin: string, socket: string, session: string,
+  link: FileLink, markdown: boolean, directory: string, origin: string, socket: string, session: string,
   run: Run, socketExists: typeof isSocket,
 ) {
   const tmux = (args: string[], timeout?: number) => run("tmux", ["-S", socket, ...args], timeout)
   const window = await tmux(["display-message", "-p", "-t", origin, "#{window_id}"])
   if (!/^@\d+$/.test(window)) throw new Error("Could not find the OpenCode tmux window")
-  const panes = await tmux(["list-panes", "-t", window, "-F", "#{pane_id}\t#{pane_dead}\t#{@opencode-editor}"])
-  const editors: Editor[] = []
-  for (const entry of panes.split("\n")) {
-    const [pane, dead, socket] = entry.split("\t")
-    if (pane !== origin && tmuxPane.test(pane) && dead === "0" && socket?.startsWith("/") && await socketExists(socket)) {
-      editors.push({ pane, socket })
+  if (!markdown) {
+    const panes = await tmux(["list-panes", "-t", window, "-F", "#{pane_id}\t#{pane_dead}\t#{@opencode-editor}"])
+    const editors: Editor[] = []
+    for (const entry of panes.split("\n")) {
+      const [pane, dead, socket] = entry.split("\t")
+      if (pane !== origin && tmuxPane.test(pane) && dead === "0" && socket?.startsWith("/") && await socketExists(socket)) {
+        editors.push({ pane, socket })
+      }
     }
-  }
-  if (editors.length === 1) {
-    await remoteEdit(run, editors[0], link)
-    await tmux(["select-pane", "-t", editors[0].pane])
-    return
+    if (editors.length === 1) {
+      await remoteEdit(run, editors[0], link)
+      await tmux(["select-pane", "-t", editors[0].pane])
+      return
+    }
   }
   const clients = await tmux(["list-clients", "-F", "#{session_id}\t#{window_id}\t#{client_activity}\t#{client_name}"])
   const client = clients.split("\n").map((row) => row.split("\t"))
@@ -64,30 +66,36 @@ async function openTmux(
     .sort((a, b) => Number(b[2]) - Number(a[2]))[0]?.[3]
   if (!client) throw new Error("No attached tmux client is showing the OpenCode pane")
   const position = link.line ? [`+call cursor(${link.line},${link.column ?? 1})`] : []
+  // Leaf accepts a local filename but not a fragment or a startup line.
+  const command = markdown ? ["leaf", "open", link.file] : ["nvim", ...position, "--", link.file]
   // A popup is not a pane. Don't let Neovim's navigation plugins target its parent pane.
   // tmux expands formats in -d; multiple command arguments bypass the shell.
-  await tmux(["display-popup", "-c", client, "-t", origin, "-E", "-w", "80%", "-h", "80%",
+  await tmux(["display-popup", "-c", client, "-t", origin, markdown ? "-EE" : "-E", "-w", "80%", "-h", "80%",
     "-d", directory.replaceAll("#", "##"), "env", "-u", "TMUX", "-u", "TMUX_PANE", "-u", "REX_SESSION",
-    "-u", "REX_BLOCK", "nvim", ...position, "--", link.file], 0)
+    "-u", "REX_BLOCK", ...command], 0)
 }
 
 export function createOpener(env = process.env, runCommand = run, socketExists = isSocket) {
   return async (link: FileLink, directory: string) => {
+    const markdown = /\.(?:md|markdown)$/i.test(link.file)
     const tmux = /^(.*),\d+,(\d+)$/.exec(env.TMUX ?? "")
     if (tmux?.[1] && tmuxPane.test(env.TMUX_PANE ?? "")) {
-      return openTmux(link, directory, env.TMUX_PANE!, tmux[1], `$${tmux[2]}`, runCommand, socketExists)
+      return openTmux(link, markdown, directory, env.TMUX_PANE!, tmux[1], `$${tmux[2]}`, runCommand, socketExists)
     }
-    const { REX_SESSION: session, REX_BLOCK: origin, REX_SERVER: endpoint, REX_BIN_DIR: bin } = env
-    if (!session || !/^session:[\da-f-]+$/i.test(session) || !origin || !rexBlock.test(origin)) {
+    const { REX_SESSION: legacySession, REX_BLOCK: origin, REX_SERVER: endpoint, REX_BIN_DIR: bin } = env
+    if (!origin || !rexBlock.test(origin)) {
       throw new Error("OpenCode is not running in tmux or Rex")
     }
+    // Rex preview.23 stopped exporting REX_SESSION. Its CLI can scope -s by block ID.
+    const session = legacySession && /^session:[\da-f-]+$/i.test(legacySession) ? legacySession : origin
     if (endpoint && !endpoint.startsWith("unix:///")) throw new Error("Opening files requires a local Rex server")
     const rex = (args: string[]) => runCommand(bin ? join(bin, "rex") : "rex",
       ["--autostart=false", ...(endpoint ? ["-S", endpoint] : []), ...args])
     const result = JSON.parse(await rex(["do", "transcript_editor", "-s", session, "-b", origin, "--json", "--args",
-      JSON.stringify({ directory, file: link.file, line: link.line, column: link.column })]))
+      JSON.stringify(markdown ? { directory, file: link.file, markdown: true } :
+        { directory, file: link.file, line: link.line, column: link.column })]))
     if (result?.floating === true) return
-    if (!rexBlock.test(result?.pane) || typeof result?.socket !== "string" || !result.socket.startsWith("/")) {
+    if (markdown || !rexBlock.test(result?.pane) || typeof result?.socket !== "string" || !result.socket.startsWith("/")) {
       throw new Error("Rex did not return a valid editor pane")
     }
     await remoteEdit(runCommand, result, link)

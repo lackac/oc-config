@@ -91,15 +91,18 @@ Run `/rich-copy-info` for the last copy result.
 
 ### Transcript links
 
-Click a file reference in a conversation to open it in Neovim. Relative paths
-use the session directory, and references such as `src/app.ts:25:3` or
-`src/app.ts#L25` jump to the specified position. Web and session links still
-use OpenCode's click handlers.
+Click a file reference in a conversation to open it. Relative paths resolve
+from the session directory, including paths with a `#marker` such as
+`README.md#plugins`. Markdown files open in a floating [Leaf](https://leaf.dipxsy.app)
+pane. Leaf resumes its saved position; it does not take a heading or line
+number on the command line. Other files open in Neovim, where `:25:3` and
+`#L25` suffixes jump to the specified position. Web and session links still use
+OpenCode's click handlers.
 
 Use **Ctrl+P → Open transcript link** or `/links` to search for file references
-and web links from the keyboard. In Rex or tmux, the opener reuses the
-`Prefix+v` editor in the same window when it can identify exactly one; otherwise
-it opens a floating editor. Reload the mux configuration and reopen any
+and web links from the keyboard. In Rex or tmux, Neovim reuses the `Prefix+v`
+editor in the same window when it can identify exactly one; otherwise it opens
+a floating editor. Reload the mux configuration and reopen any
 pre-existing `Prefix+v` editor to enable reuse. File paths must exist on the
 machine running the TUI.
 
